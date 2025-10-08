@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phoenix Bikes - Donate Your Bike</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-brand">
+                <h1>Phoenix Bikes</h1>
+            </div>
+            <div class="nav-links">
+                <button class="login-btn" id="loginBtn">Login</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main">
+        <!-- Donation Instructions -->
+        <section class="section">
+            <div class="container">
+                <h2 class="section-title">Donate Your Bike</h2>
+                <div class="instructions-box">
+                    <h3>How to Donate Your Bike:</h3>
+                    <p>Simply enter Phoenix Bikes, head up to the counter, and say "I'm here to donate my bike." Our team will help you to fill out a quick form for your receipt and get your bike ready to be processed.</p>
+                </div>
+                
+                <!-- Acceptance Criteria Table -->
+                <div class="criteria-table-container">
+                    <h3>What We Accept</h3>
+                    <table class="criteria-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>We Accept:</th>
+                                <th>We do NOT accept:</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Bicycles</td>
+                                <td>
+                                    • Bikes in rideable or repairable condition<br>
+                                    • Youth bikes (16" wheels or larger)<br>
+                                    • Mountain bikes (hardtail or full suspension)<br>
+                                    • Road bikes & touring bikes<br>
+                                    • Hybrid & commuter bikes<br>
+                                    • Single-speed & fixed-gear bikes<br>
+                                    • Bikes with damaged frames but good components
+                                </td>
+                                <td>
+                                    • Excessively rusted bikes<br>
+                                    • Bikes missing major parts (forks, proprietary parts)<br>
+                                    • Bikes with seized or frozen parts<br>
+                                    • Low-quality department store bikes (Roadmaster, Huffy, Magna)<br>
+                                    • Tandems, 3-wheel bikes
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Tires & Tubes</td>
+                                <td>
+                                    • New or gently used tires & tubes<br>
+                                    • All sizes (12"– 29" tires)<br>
+                                    • Presta or Schrader valve tubes
+                                </td>
+                                <td>
+                                    • Dry-rotted, cracked tires<br>
+                                    • Bald tires with no tread left<br>
+                                    • Tires with large cuts or holes
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Wheels</td>
+                                <td>
+                                    • Good condition (no major dents or warping)<br>
+                                    • Wheels with minor wobble or loose spokes<br>
+                                    • Rim brake or disc brake compatible wheels<br>
+                                    • Wheels with hubs in good condition<br>
+                                    • 26", 700c, and 29" wheels
+                                </td>
+                                <td>
+                                    • Severely bent or warped wheels<br>
+                                    • Cracked or dented rims<br>
+                                    • Wheels with missing hubs or axles<br>
+                                    • Wheels with completely rusted spokes
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Bike Parts</td>
+                                <td>
+                                    • Drivetrain Components<br>
+                                    • Braking Systems<br>
+                                    • Handlebars & Stems<br>
+                                    • Cables & Housing<br>
+                                    • Headsets & Forks
+                                </td>
+                                <td>
+                                    • Damaged or excessively worn parts<br>
+                                    • Heavily rusted or seized parts<br>
+                                    • Non-bike-specific parts
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Accessories</td>
+                                <td>
+                                    • Bike locks with combination code or key<br>
+                                    • Lights & Reflectors<br>
+                                    • Kickstands<br>
+                                    • Bells & Horns<br>
+                                    • Mirrors & water bottle cages<br>
+                                    • Handlebar tape & grips<br>
+                                    • Saddles & handlebar bags
+                                </td>
+                                <td>
+                                    • Used water bottles<br>
+                                    • Broken or non-functional locks<br>
+                                    • Dead or non-working lights<br>
+                                    • Expired helmets<br>
+                                    • Non-bike related accessories
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Tools & Gear</td>
+                                <td>
+                                    • Bike-specific tools<br>
+                                    • Repair stands<br>
+                                    • Lubricants & Cleaners<br>
+                                    • Protective gear (gloves, safety glasses, aprons)<br>
+                                    • Cycling gloves and socks
+                                </td>
+                                <td>
+                                    • Broken or damaged tools<br>
+                                    • Dirty, dried-out lubricants or cleaners<br>
+                                    • Non-bike-specific tools or gear<br>
+                                    • Cycling jerseys, bibs, or other apparel
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Other Items</td>
+                                <td>
+                                    • Workshop supplies and consumables<br>
+                                    • Cleaning supplies (hand cleaner, rags & shop towels, spray bottles, brushes, sponges)
+                                </td>
+                                <td>
+                                    • Car bike racks<br>
+                                    • Stationary/exercise bikes/bike trainers<br>
+                                    • Hazardous materials<br>
+                                    • Non-bike-related equipment
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Phoenix Bikes. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Login</h2>
+            <form class="login-form">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="submit-btn">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Load local config for development (ignored by git) -->
+    <script src="local-config.js"></script>
+    <script src="env-config.js"></script>
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

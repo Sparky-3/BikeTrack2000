@@ -1,0 +1,19 @@
+{
+  "name": "phoenix-bikes",
+  "version": "1.0.0",
+  "description": "Phoenix Bikes donation platform with Supabase and Netlify",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx http-server -p 8000 -o",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": [
+    "bikes",
+    "donation",
+    "supabase",
+    "netlify"
+  ],
+  "author": "Phoenix Bikes",
+  "license": "MIT",
+  "devDependencies": {}
+}

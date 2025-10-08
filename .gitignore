@@ -1,0 +1,33 @@
+# Environment variables
+.env
+.env.local
+.env.production
+local-config.js
+
+# Netlify
+.netlify/
+netlify-functions/
+
+# Node modules (if you add any build tools later)
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Local development
+dist/
+build/
+.cache/
