@@ -79,15 +79,58 @@ async function updateAuthUI() {
     const loginBtn = document.getElementById('loginBtn');
     
     if (user && loginBtn) {
-        loginBtn.textContent = 'Logout';
+        // Initialize user role
+        await window.roleManager.initializeUserRole(user);
+        
+        // Update login button to show user info and logout
+        const roleName = window.roleManager.getRoleName();
+        loginBtn.textContent = `Logout (${roleName})`;
         loginBtn.onclick = logout;
+        
+        // Load appropriate interface based on role
+        await loadRoleBasedInterface();
     } else if (loginBtn) {
         loginBtn.textContent = 'Login';
         loginBtn.onclick = () => {
             const modal = document.getElementById('loginModal');
             if (modal) modal.style.display = 'block';
         };
+        
+        // Load public interface
+        await loadPublicInterface();
     }
+}
+
+// Load interface based on user role
+async function loadRoleBasedInterface() {
+    const role = window.roleManager.currentRole;
+    
+    if (!role) {
+        await loadPublicInterface();
+        return;
+    }
+
+    // Hide public interface elements
+    const publicElements = document.querySelectorAll('.public-only');
+    publicElements.forEach(el => el.style.display = 'none');
+
+    // Show appropriate admin interface
+    if (role === 'sales') {
+        await loadSalesInterface();
+    } else if (['earn-a-bike', 'give-a-bike', 'admin'].includes(role)) {
+        await loadAdminInterface();
+    }
+}
+
+// Load public interface for non-logged-in users
+async function loadPublicInterface() {
+    // Show public elements
+    const publicElements = document.querySelectorAll('.public-only');
+    publicElements.forEach(el => el.style.display = 'block');
+
+    // Hide admin interfaces
+    const adminElements = document.querySelectorAll('.admin-only');
+    adminElements.forEach(el => el.style.display = 'none');
 }
 
 // Listen for auth state changes

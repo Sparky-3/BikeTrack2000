@@ -1,0 +1,93 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.bike_sizes (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  size text UNIQUE,
+  CONSTRAINT bike_sizes_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.bikes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  serial_number bigint NOT NULL UNIQUE,
+  brand text,
+  model text,
+  type USER-DEFINED,
+  size text,
+  value integer,
+  program USER-DEFINED NOT NULL,
+  condition USER-DEFINED,
+  donated_to text,
+  notes text,
+  status USER-DEFINED NOT NULL DEFAULT 'In stock'::status,
+  bottom_bracket_serial text UNIQUE,
+  CONSTRAINT bikes_pkey PRIMARY KEY (id),
+  CONSTRAINT sales_bikes_size_fkey FOREIGN KEY (size) REFERENCES public.bike_sizes(size),
+  CONSTRAINT sales_bikes_model_fkey FOREIGN KEY (model) REFERENCES public.models(name),
+  CONSTRAINT sales_bikes_brand_fkey FOREIGN KEY (brand) REFERENCES public.brands(name),
+  CONSTRAINT bikes_donated_to_fkey FOREIGN KEY (donated_to) REFERENCES public.recipients(name)
+);
+CREATE TABLE public.bikes_donated (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  brand text,
+  model text,
+  value bigint,
+  CONSTRAINT bikes_donated_pkey PRIMARY KEY (id),
+  CONSTRAINT bikes_donated_brand_fkey FOREIGN KEY (brand) REFERENCES public.brands(name),
+  CONSTRAINT bikes_donated_model_fkey FOREIGN KEY (model) REFERENCES public.models(name)
+);
+CREATE TABLE public.brands (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name text NOT NULL UNIQUE,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT brands_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.donations (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  email text,
+  name text,
+  total_bikes_donated integer,
+  total_estimated_value bigint,
+  total_parts_donated real,
+  CONSTRAINT donations_pkey PRIMARY KEY (id),
+  CONSTRAINT donations_email_fkey FOREIGN KEY (email) REFERENCES public.donors(email),
+  CONSTRAINT donations_name_fkey FOREIGN KEY (name) REFERENCES public.donors(name)
+);
+CREATE TABLE public.donors (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  name text UNIQUE,
+  email text UNIQUE,
+  CONSTRAINT donors_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.models (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name text NOT NULL UNIQUE,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT models_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.parts_donated (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  number_of_parts bigint,
+  parts_value bigint,
+  CONSTRAINT parts_donated_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.recipients (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  name text NOT NULL UNIQUE,
+  CONSTRAINT recipients_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.user_roles (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  user_id uuid NOT NULL UNIQUE,
+  role USER-DEFINED,
+  CONSTRAINT user_roles_pkey PRIMARY KEY (id),
+  CONSTRAINT user_roles_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
