@@ -27,9 +27,14 @@ async function loadConfigFromNetlify() {
             window.__SUPABASE_ANON_KEY__ = config.supabaseAnonKey;
             console.log('✅ Configuration loaded from Netlify function');
             
-            // Trigger config.js to reinitialize if needed
-            if (window.initializeSupabase) {
-                window.initializeSupabase();
+            // Reinitialize Supabase client with new config
+            if (window.supabase && window.__SUPABASE_URL__ && window.__SUPABASE_ANON_KEY__) {
+                try {
+                    window.supabaseClient = window.supabase.createClient(window.__SUPABASE_URL__, window.__SUPABASE_ANON_KEY__);
+                    console.log('✅ Supabase client reinitialized with Netlify config');
+                } catch (error) {
+                    console.error('❌ Error reinitializing Supabase client:', error);
+                }
             }
         }
     } catch (error) {

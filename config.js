@@ -27,11 +27,20 @@ if (supabaseUrl && supabaseAnonKey) {
         console.error('❌ Error initializing Supabase client:', error);
     }
 } else {
-    console.warn('⚠️ Supabase URL or Anon Key is missing.');
-    console.warn('For local development, you can set them in localStorage:');
-    console.warn('localStorage.setItem("supabase_url", "your-url")');
-    console.warn('localStorage.setItem("supabase_anon_key", "your-key")');
-    console.warn('For production, configure environment variables in Netlify.');
+    // Only show warnings if we're not on Netlify (where env-config.js will load them)
+    const isNetlify = window.location.hostname !== 'localhost' && 
+                     window.location.hostname !== '127.0.0.1' && 
+                     window.location.hostname.includes('netlify');
+    
+    if (!isNetlify) {
+        console.warn('⚠️ Supabase URL or Anon Key is missing.');
+        console.warn('For local development, you can set them in localStorage:');
+        console.warn('localStorage.setItem("supabase_url", "your-url")');
+        console.warn('localStorage.setItem("supabase_anon_key", "your-key")');
+        console.warn('For production, configure environment variables in Netlify.');
+    } else {
+        console.log('⏳ Waiting for configuration from Netlify function...');
+    }
 }
 
 // Export for use in other files
