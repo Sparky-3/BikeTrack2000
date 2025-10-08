@@ -187,7 +187,17 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Load local config for development (ignored by git) -->
-    <script src="local-config.js"></script>
+    <script>
+        // Only load local-config.js in development
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            const script = document.createElement('script');
+            script.src = 'local-config.js';
+            script.onerror = function() {
+                console.warn('⚠️ local-config.js not found - using production configuration');
+            };
+            document.head.appendChild(script);
+        }
+    </script>
     <script src="env-config.js"></script>
     <script src="config.js"></script>
     <script src="auth.js"></script>
