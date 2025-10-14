@@ -476,8 +476,16 @@
                 event.preventDefault();
                 
                 const donationType = document.getElementById('donationType').value;
-                const numberOfBikes = parseInt(document.getElementById('numberOfBikes').value) || 0;
-                const numberOfParts = parseInt(document.getElementById('numberOfParts').value) || 0;
+                
+                // Only get number of bikes if donation type includes bikes
+                const numberOfBikes = (donationType === 'bike' || donationType === 'both') 
+                    ? parseInt(document.getElementById('numberOfBikes').value) || 0 
+                    : 0;
+                
+                // Only get number of parts if donation type includes parts
+                const numberOfParts = (donationType === 'parts' || donationType === 'both') 
+                    ? parseInt(document.getElementById('numberOfParts').value) || 0 
+                    : 0;
                 
                 // Get form data
                 const formData = {
