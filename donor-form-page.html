@@ -208,6 +208,45 @@
     <script src="config.js"></script>
     <script src="env-config.js"></script>
     <script>
+        // Store brands and models globally
+        window.bikeBrands = [];
+        window.bikeModels = [];
+        
+        // Fetch brands and models from database
+        async function loadBrandsAndModels() {
+            if (!window.supabaseClient) {
+                console.error('Supabase client not initialized');
+                return;
+            }
+            
+            try {
+                // Fetch brands
+                const { data: brands, error: brandsError } = await window.supabaseClient
+                    .from('brands')
+                    .select('name')
+                    .order('name', { ascending: true });
+                
+                if (brandsError) throw brandsError;
+                window.bikeBrands = brands.map(b => b.name);
+                
+                // Fetch models
+                const { data: models, error: modelsError } = await window.supabaseClient
+                    .from('models')
+                    .select('name')
+                    .order('name', { ascending: true });
+                
+                if (modelsError) throw modelsError;
+                window.bikeModels = models.map(m => m.name);
+                
+            } catch (error) {
+                console.error('Error loading brands and models:', error);
+            }
+        }
+        
+        // Load brands and models when page loads
+        window.addEventListener('DOMContentLoaded', loadBrandsAndModels);
+    </script>
+    <script>
         // Generate dynamic donation sections based on type and count
         function generateDonationSections() {
             const donationType = document.getElementById('donationType').value;
@@ -246,6 +285,13 @@
                 for (let i = 1; i <= numberOfBikes; i++) {
                     container.innerHTML += generateBikeSection(i);
                 }
+                
+                // Add event listeners for "Add New" selections
+                setTimeout(() => {
+                    for (let i = 1; i <= numberOfBikes; i++) {
+                        setupBrandModelListeners(i);
+                    }
+                }, 100);
             }
             
             if (donationType === 'parts' || donationType === 'both') {
@@ -256,66 +302,87 @@
         
         // Generate a bike section HTML
         function generateBikeSection(index) {
+            const brandsOptions = window.bikeBrands.map(brand => 
+                `<option value="${brand}">${brand}</option>`
+            ).join('');
+            
+            const modelsOptions = window.bikeModels.map(model => 
+                `<option value="${model}">${model}</option>`
+            ).join('');
+            
             return `
                 <div class="donation-section">
                     <h3>Bike ${index}</h3>
                     
                     <div class="form-group">
-                        <label for="bikeBrand_${index}">Brand</label>
-                        <input type="text" id="bikeBrand_${index}" name="bikeBrand_${index}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="bikeModel_${index}">Model</label>
-                        <input type="text" id="bikeModel_${index}" name="bikeModel_${index}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="bikeType_${index}">Type</label>
-                        <select id="bikeType_${index}" name="bikeType_${index}">
-                            <option value="">Select bike type</option>
-                            <option value="road">Road Bike</option>
-                            <option value="mountain">Mountain Bike</option>
-                            <option value="hybrid">Hybrid</option>
-                            <option value="cruiser">Cruiser</option>
-                            <option value="bmx">BMX</option>
-                            <option value="other">Other</option>
+                        <label for="bikeBrand_${index}">Brand *</label>
+                        <select id="bikeBrand_${index}" name="bikeBrand_${index}" required>
+                            <option value="">Select brand...</option>
+                            ${brandsOptions}
+                            <option value="__ADD_NEW__">+ Add New Brand</option>
                         </select>
+                        <input type="text" id="bikeBrandNew_${index}" name="bikeBrandNew_${index}" 
+                               placeholder="Enter new brand name" 
+                               style="display: none; margin-top: 0.5rem;"
+                               class="form-control">
                     </div>
                     
                     <div class="form-group">
-                        <label for="bikeSize_${index}">Size</label>
-                        <input type="text" id="bikeSize_${index}" name="bikeSize_${index}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="bikeCondition_${index}">Condition</label>
-                        <select id="bikeCondition_${index}" name="bikeCondition_${index}">
-                            <option value="">Select condition</option>
-                            <option value="excellent">Excellent</option>
-                            <option value="good">Good</option>
-                            <option value="fair">Fair</option>
-                            <option value="poor">Poor</option>
-                            <option value="needs_repair">Needs Repair</option>
+                        <label for="bikeModel_${index}">Model *</label>
+                        <select id="bikeModel_${index}" name="bikeModel_${index}" required>
+                            <option value="">Select model...</option>
+                            ${modelsOptions}
+                            <option value="__ADD_NEW__">+ Add New Model</option>
                         </select>
+                        <input type="text" id="bikeModelNew_${index}" name="bikeModelNew_${index}" 
+                               placeholder="Enter new model name" 
+                               style="display: none; margin-top: 0.5rem;"
+                               class="form-control">
                     </div>
                     
                     <div class="form-group">
-                        <label for="bikeValue_${index}">Estimated Value ($)</label>
-                        <input type="number" id="bikeValue_${index}" name="bikeValue_${index}" min="0" step="0.01">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="bikeSerialNumber_${index}">Serial Number</label>
-                        <input type="text" id="bikeSerialNumber_${index}" name="bikeSerialNumber_${index}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="bikeNotes_${index}">Notes</label>
-                        <textarea id="bikeNotes_${index}" name="bikeNotes_${index}" rows="3" placeholder="Any additional information about this bike..."></textarea>
+                        <label for="bikeValue_${index}">Estimated Value ($) *</label>
+                        <input type="number" id="bikeValue_${index}" name="bikeValue_${index}" 
+                               min="0" step="0.01" required>
                     </div>
                 </div>
             `;
+        }
+        
+        // Setup listeners for brand/model "Add New" options
+        function setupBrandModelListeners(index) {
+            const brandSelect = document.getElementById(`bikeBrand_${index}`);
+            const brandNewInput = document.getElementById(`bikeBrandNew_${index}`);
+            const modelSelect = document.getElementById(`bikeModel_${index}`);
+            const modelNewInput = document.getElementById(`bikeModelNew_${index}`);
+            
+            if (brandSelect && brandNewInput) {
+                brandSelect.addEventListener('change', function() {
+                    if (this.value === '__ADD_NEW__') {
+                        brandNewInput.style.display = 'block';
+                        brandNewInput.required = true;
+                        this.required = false;
+                    } else {
+                        brandNewInput.style.display = 'none';
+                        brandNewInput.required = false;
+                        this.required = true;
+                    }
+                });
+            }
+            
+            if (modelSelect && modelNewInput) {
+                modelSelect.addEventListener('change', function() {
+                    if (this.value === '__ADD_NEW__') {
+                        modelNewInput.style.display = 'block';
+                        modelNewInput.required = true;
+                        this.required = false;
+                    } else {
+                        modelNewInput.style.display = 'none';
+                        modelNewInput.required = false;
+                        this.required = true;
+                    }
+                });
+            }
         }
         
         // Generate a parts section HTML
@@ -399,15 +466,27 @@
                 // Collect bike information if applicable
                 if (donationType === 'bike' || donationType === 'both') {
                     for (let i = 1; i <= numberOfBikes; i++) {
+                        const brandSelect = document.getElementById(`bikeBrand_${i}`);
+                        const brandNewInput = document.getElementById(`bikeBrandNew_${i}`);
+                        const modelSelect = document.getElementById(`bikeModel_${i}`);
+                        const modelNewInput = document.getElementById(`bikeModelNew_${i}`);
+                        
+                        // Get brand (either from dropdown or new input)
+                        let brand = brandSelect?.value || '';
+                        if (brand === '__ADD_NEW__') {
+                            brand = brandNewInput?.value || '';
+                        }
+                        
+                        // Get model (either from dropdown or new input)
+                        let model = modelSelect?.value || '';
+                        if (model === '__ADD_NEW__') {
+                            model = modelNewInput?.value || '';
+                        }
+                        
                         const bike = {
-                            brand: document.getElementById(`bikeBrand_${i}`)?.value || '',
-                            model: document.getElementById(`bikeModel_${i}`)?.value || '',
-                            type: document.getElementById(`bikeType_${i}`)?.value || '',
-                            size: document.getElementById(`bikeSize_${i}`)?.value || '',
-                            condition: document.getElementById(`bikeCondition_${i}`)?.value || '',
-                            value: parseFloat(document.getElementById(`bikeValue_${i}`)?.value) || 0,
-                            serialNumber: document.getElementById(`bikeSerialNumber_${i}`)?.value || '',
-                            notes: document.getElementById(`bikeNotes_${i}`)?.value || ''
+                            brand: brand,
+                            model: model,
+                            value: parseFloat(document.getElementById(`bikeValue_${i}`)?.value) || 0
                         };
                         formData.bikes.push(bike);
                     }
@@ -476,17 +555,56 @@
             }
             
             try {
-                // Start a transaction-like process
-                const { data: donorData, error: donorError } = await window.supabaseClient
-                    .from('donors')
-                    .upsert({
-                        name: formData.donor.name,
-                        email: formData.donor.email
-                    })
-                    .select()
-                    .single();
+                // Check if donor already exists by name or email
+                let donorData = null;
                 
-                if (donorError) throw donorError;
+                // Try to find existing donor by email first (most reliable)
+                if (formData.donor.email) {
+                    const { data: existingByEmail } = await window.supabaseClient
+                        .from('donors')
+                        .select('*')
+                        .eq('email', formData.donor.email)
+                        .single();
+                    
+                    if (existingByEmail) {
+                        donorData = existingByEmail;
+                        console.log('Found existing donor by email:', donorData);
+                    }
+                }
+                
+                // If not found by email, try by name
+                if (!donorData && formData.donor.name) {
+                    const { data: existingByName } = await window.supabaseClient
+                        .from('donors')
+                        .select('*')
+                        .eq('name', formData.donor.name)
+                        .single();
+                    
+                    if (existingByName) {
+                        donorData = existingByName;
+                        console.log('Found existing donor by name:', donorData);
+                    }
+                }
+                
+                // If donor doesn't exist, create a new one
+                if (!donorData) {
+                    const { data: newDonor, error: donorError } = await window.supabaseClient
+                        .from('donors')
+                        .insert({
+                            name: formData.donor.name,
+                            email: formData.donor.email
+                        })
+                        .select()
+                        .single();
+                    
+                    if (donorError) {
+                        console.error('Error creating new donor:', donorError);
+                        throw new Error('Could not create donor record: ' + donorError.message);
+                    }
+                    
+                    donorData = newDonor;
+                    console.log('Created new donor:', donorData);
+                }
                 
                 // Calculate total values
                 const totalBikes = formData.bikes.length;
@@ -513,6 +631,23 @@
                 
                 // Create bike records if applicable
                 if (formData.bikes.length > 0) {
+                    // First, ensure all brands exist in the brands table
+                    const uniqueBrands = [...new Set(formData.bikes.map(b => b.brand).filter(b => b))];
+                    for (const brandName of uniqueBrands) {
+                        await window.supabaseClient
+                            .from('brands')
+                            .upsert({ name: brandName }, { onConflict: 'name', ignoreDuplicates: true });
+                    }
+                    
+                    // Then, ensure all models exist in the models table
+                    const uniqueModels = [...new Set(formData.bikes.map(b => b.model).filter(m => m))];
+                    for (const modelName of uniqueModels) {
+                        await window.supabaseClient
+                            .from('models')
+                            .upsert({ name: modelName }, { onConflict: 'name', ignoreDuplicates: true });
+                    }
+                    
+                    // Now insert the bike records
                     const bikeRecords = formData.bikes.map(bike => ({
                         brand: bike.brand,
                         model: bike.model,
