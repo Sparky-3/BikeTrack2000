@@ -698,7 +698,7 @@ body:has(.donation-form) .header {
 }
 
 .bikes-table tr:hover {
-    background: #1d4ed8;
+    background: #1e3a8a;
 }
 
 .bikes-table tr:nth-child(even) td {
@@ -707,8 +707,8 @@ body:has(.donation-form) .header {
 }
 
 .bikes-table tr:hover td {
-    background: #1d4ed8;
-    color: #1e3a8a;
+    background: #1e3a8a;
+    color: #fef3c7;
 }
 
 .work-order-btn {
@@ -1172,7 +1172,7 @@ body:has(.donation-form) .header {
 }
 
 .bikes-table tbody tr:hover {
-    background: #cce7ff;
+    background: #1e3a8a;
 }
 
 .bikes-table td {
