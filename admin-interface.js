@@ -66,28 +66,27 @@ async function createAdminInterface() {
         </div>
 
         <div class="admin-filters">
-            <div class="filter-section-left">
-                <div class="filter-tabs">
-                    <button class="filter-tab active" data-filter="on-hand">On Hand</button>
-                    <button class="filter-tab" data-filter="trashed">Trashed</button>
-                    <button class="filter-tab" data-filter="out">Out</button>
-                    <button class="filter-tab" data-filter="strip">Strip</button>
-                    <button class="filter-tab" data-filter="donors">Donors</button>
-                </div>
-                
-                <div class="search-container">
-                    <input type="text" id="bikeSearch" placeholder="Search bikes..." class="search-input">
-                    <button id="searchBtn" class="btn btn-secondary">Search</button>
-                </div>
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="on-hand">On Hand</button>
+                <button class="filter-tab" data-filter="trashed">Trashed</button>
+                <button class="filter-tab" data-filter="out">Out</button>
+                <button class="filter-tab" data-filter="strip">Strip</button>
+                <button class="filter-tab" data-filter="donors">Donors</button>
             </div>
             
-            ${window.roleManager.canSeeDonorForm() ? '<button id="donorFormBtn" class="btn btn-primary">Donor Form</button>' : ''}
+            <div class="search-container">
+                <input type="text" id="bikeSearch" placeholder="Search bikes..." class="search-input">
+                <button id="searchBtn" class="btn btn-secondary">Search</button>
+            </div>
         </div>
 
         <div class="bikes-table-container">
             <div class="table-header">
                 <h3>Bikes Inventory</h3>
-                <button id="refreshBikes" class="btn btn-secondary">Refresh</button>
+                <div class="table-header-actions">
+                    ${window.roleManager.canSeeDonorForm() ? '<button id="donorFormBtn" class="btn btn-primary">Donor Form</button>' : ''}
+                    <button id="refreshBikes" class="btn btn-secondary">Refresh</button>
+                </div>
             </div>
             <div class="bikes-table" id="bikesTable">
                 <div class="loading">Loading bikes...</div>
@@ -133,28 +132,27 @@ async function createSalesInterface() {
         </div>
 
         <div class="admin-filters">
-            <div class="filter-section-left">
-                <div class="filter-tabs">
-                    <button class="filter-tab active" data-filter="on-hand">On Hand</button>
-                    <button class="filter-tab" data-filter="trashed">Trashed</button>
-                    <button class="filter-tab" data-filter="earned">Earned</button>
-                    <button class="filter-tab" data-filter="strip">Strip</button>
-                    <button class="filter-tab" data-filter="donors">Donors</button>
-                </div>
-                
-                <div class="search-container">
-                    <input type="text" id="bikeSearch" placeholder="Search bikes..." class="search-input">
-                    <button id="searchBtn" class="btn btn-secondary">Search</button>
-                </div>
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="on-hand">On Hand</button>
+                <button class="filter-tab" data-filter="trashed">Trashed</button>
+                <button class="filter-tab" data-filter="earned">Earned</button>
+                <button class="filter-tab" data-filter="strip">Strip</button>
+                <button class="filter-tab" data-filter="donors">Donors</button>
             </div>
             
-            <button id="donorFormBtn" class="btn btn-primary">Donor Form</button>
+            <div class="search-container">
+                <input type="text" id="bikeSearch" placeholder="Search bikes..." class="search-input">
+                <button id="searchBtn" class="btn btn-secondary">Search</button>
+            </div>
         </div>
 
         <div class="bikes-table-container">
             <div class="table-header">
                 <h3>Bikes Inventory</h3>
-                <button id="refreshBikes" class="btn btn-secondary">Refresh</button>
+                <div class="table-header-actions">
+                    <button id="donorFormBtn" class="btn btn-primary">Donor Form</button>
+                    <button id="refreshBikes" class="btn btn-secondary">Refresh</button>
+                </div>
             </div>
             <div class="bikes-table" id="bikesTable">
                 <div class="loading">Loading bikes...</div>
