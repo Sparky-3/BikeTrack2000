@@ -658,52 +658,52 @@ body:has(.donation-form) .header {
 }
 
 .bikes-table th:nth-child(1) {
-    width: 8%;
+    width: 8.33%;
 }
 
 .bikes-table th:nth-child(2) {
-    width: 10%;
+    width: 8.33%;
 }
 
 .bikes-table th:nth-child(3) {
-    width: 10%;
+    width: 8.33%;
 }
 
 .bikes-table th:nth-child(4) {
-    width: 8%;
+    width: 8.33%;
 }
 
 .bikes-table th:nth-child(5) {
-    width: 8%;
+    width: 8.33%;
 }
 
 .bikes-table th:nth-child(6) {
-    width: 8%;
+    width: 8.33%;
     text-align: right;
 }
 
 .bikes-table th:nth-child(7) {
-    width: 10%;
+    width: 8.33%;
 }
 
 .bikes-table th:nth-child(8) {
-    width: 10%;
+    width: 8.33%;
 }
 
 .bikes-table th:nth-child(9) {
-    width: 10%;
+    width: 8.33%;
 }
 
 .bikes-table th:nth-child(10) {
-    width: 10%;
+    width: 8.33%;
 }
 
 .bikes-table th:nth-child(11) {
-    width: 8%;
+    width: 8.33%;
 }
 
 .bikes-table th:nth-child(12) {
-    width: 10%;
+    width: 8.33%;
 }
 
 .bikes-table td {
