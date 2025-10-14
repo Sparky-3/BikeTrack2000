@@ -1078,29 +1078,35 @@ body:has(.donation-form) .header {
     text-shadow: 1px 1px 0px #0f172a;
 }
 
-.filter-options {
+.search-container {
     display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
 }
 
-.filter-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    font-weight: 600;
+.search-input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 2px solid #1e3a8a;
+    background: #fef3c7;
+    border-radius: 0;
+    font-size: 1rem;
     color: #1e3a8a;
     font-family: 'Courier New', monospace;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    text-shadow: 1px 1px 0px #fef3c7;
+    font-weight: 500;
+    transition: all 0.3s ease;
 }
 
-.filter-checkbox input[type="checkbox"] {
-    width: 1.25rem;
-    height: 1.25rem;
-    cursor: pointer;
+.search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    background: #e6f3ff;
+}
+
+.search-input::placeholder {
+    color: #64748b;
+    font-style: italic;
 }
 
 .bikes-table-container {

@@ -74,22 +74,12 @@ async function createAdminInterface() {
                 <button class="filter-tab" data-filter="trashed">Trashed</button>
                 <button class="filter-tab" data-filter="out">Out</button>
                 <button class="filter-tab" data-filter="strip">Strip</button>
-                <button class="filter-tab" data-filter="donor-search">Donor Search</button>
+                <button class="filter-tab" data-filter="donors">Donors</button>
             </div>
             
-            <div class="filter-options">
-                <label class="filter-checkbox">
-                    <input type="checkbox" id="inStockOnly" checked>
-                    Show only bikes In Stock
-                </label>
-                <label class="filter-checkbox">
-                    <input type="checkbox" id="trashedOnly">
-                    Show only bikes trashed
-                </label>
-                <label class="filter-checkbox">
-                    <input type="checkbox" id="earnedOnly">
-                    Show only bikes Earned
-                </label>
+            <div class="search-container">
+                <input type="text" id="bikeSearch" placeholder="Search bikes..." class="search-input">
+                <button id="searchBtn" class="btn btn-secondary">Search</button>
             </div>
         </div>
 
@@ -150,22 +140,12 @@ async function createSalesInterface() {
                 <button class="filter-tab" data-filter="trashed">Trashed</button>
                 <button class="filter-tab" data-filter="earned">Earned</button>
                 <button class="filter-tab" data-filter="strip">Strip</button>
-                <button class="filter-tab" data-filter="search">Search</button>
+                <button class="filter-tab" data-filter="donors">Donors</button>
             </div>
             
-            <div class="filter-options">
-                <label class="filter-checkbox">
-                    <input type="checkbox" id="inStockOnly" checked>
-                    Show only bikes In Stock
-                </label>
-                <label class="filter-checkbox">
-                    <input type="checkbox" id="trashedOnly">
-                    Show only bikes trashed
-                </label>
-                <label class="filter-checkbox">
-                    <input type="checkbox" id="earnedOnly">
-                    Show only bikes Earned
-                </label>
+            <div class="search-container">
+                <input type="text" id="bikeSearch" placeholder="Search bikes..." class="search-input">
+                <button id="searchBtn" class="btn btn-secondary">Search</button>
             </div>
         </div>
 
@@ -193,25 +173,55 @@ function setupAdminEventListeners() {
         tab.addEventListener('click', function() {
             document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
             this.classList.add('active');
-            loadBikesTable();
+            const filterType = this.dataset.filter;
+            if (filterType === 'donors') {
+                loadDonorsTable();
+            } else {
+                loadBikesTable();
+            }
         });
     });
 
-    // Filter checkboxes
-    document.querySelectorAll('.filter-checkbox input').forEach(checkbox => {
-        checkbox.addEventListener('change', loadBikesTable);
-    });
+    // Search functionality
+    const searchInput = document.getElementById('bikeSearch');
+    const searchBtn = document.getElementById('searchBtn');
+    
+    if (searchBtn) {
+        searchBtn.addEventListener('click', performBikeSearch);
+    }
+    
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performBikeSearch();
+            }
+        });
+    }
 
     // Refresh button
     const refreshBtn = document.getElementById('refreshBikes');
     if (refreshBtn) {
-        refreshBtn.addEventListener('click', loadBikesTable);
+        refreshBtn.addEventListener('click', () => {
+            const activeTab = document.querySelector('.filter-tab.active');
+            if (activeTab?.dataset.filter === 'donors') {
+                loadDonorsTable();
+            } else {
+                loadBikesTable();
+            }
+        });
     }
 
     // Donor form button
     const donorFormBtn = document.getElementById('donorFormBtn');
     if (donorFormBtn) {
-        donorFormBtn.addEventListener('click', openDonorForm);
+        donorFormBtn.addEventListener('click', () => {
+            // Call the global donor form function from donor-form.js
+            if (typeof window.openDonorForm === 'function') {
+                window.openDonorForm();
+            } else {
+                alert('Donor form functionality is not available.');
+            }
+        });
     }
 }
 
@@ -255,9 +265,6 @@ async function loadBikesTable() {
     try {
         // Get current filter values
         const activeTab = document.querySelector('.filter-tab.active');
-        const inStockOnly = document.getElementById('inStockOnly')?.checked;
-        const trashedOnly = document.getElementById('trashedOnly')?.checked;
-        const earnedOnly = document.getElementById('earnedOnly')?.checked;
 
         // Build filters object
         const filters = {};
@@ -272,7 +279,8 @@ async function loadBikesTable() {
                     filters.status = 'Trashed';
                     break;
                 case 'out':
-                    // Show donated, for sale, and earned
+                    // Show all bikes that are not in stock, trashed, or strip
+                    filters.statusNotIn = ['In stock', 'Trashed', 'Strip'];
                     break;
                 case 'earned':
                     filters.status = 'Earned';
@@ -284,22 +292,9 @@ async function loadBikesTable() {
         }
 
         const bikes = await window.roleManager.getFilteredBikes(filters);
-        
-        // Apply additional filters
-        let filteredBikes = bikes;
-        
-        if (inStockOnly) {
-            filteredBikes = filteredBikes.filter(bike => bike.status === 'In stock');
-        }
-        if (trashedOnly) {
-            filteredBikes = filteredBikes.filter(bike => bike.status === 'Trashed');
-        }
-        if (earnedOnly) {
-            filteredBikes = filteredBikes.filter(bike => bike.status === 'Earned');
-        }
 
         // Render table
-        renderBikesTable(filteredBikes);
+        renderBikesTable(bikes);
         
     } catch (error) {
         console.error('Error loading bikes table:', error);
@@ -363,14 +358,119 @@ function renderBikesTable(bikes) {
     tableContainer.appendChild(table);
 }
 
-// Open donor form modal
-function openDonorForm() {
-    // Use the donor form functionality from donor-form.js
-    if (typeof window.openDonorForm === 'function') {
-        window.openDonorForm();
-    } else {
-        alert('Donor form functionality is not available.');
+// Perform bike search
+async function performBikeSearch() {
+    const searchInput = document.getElementById('bikeSearch');
+    const tableContainer = document.getElementById('bikesTable');
+    
+    if (!searchInput || !tableContainer) return;
+    
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    
+    if (!searchTerm) {
+        // If search is empty, just reload the current table
+        loadBikesTable();
+        return;
     }
+    
+    tableContainer.innerHTML = '<div class="loading">Searching bikes...</div>';
+    
+    try {
+        // Get all bikes that the user has access to
+        const allBikes = await window.roleManager.getFilteredBikes({});
+        
+        // Search across multiple fields
+        const searchResults = allBikes.filter(bike => {
+            const searchableFields = [
+                bike.serial_number?.toString(),
+                bike.brand,
+                bike.model,
+                bike.type,
+                bike.size,
+                bike.status,
+                bike.program,
+                bike.donated_to,
+                bike.notes
+            ];
+            
+            return searchableFields.some(field => 
+                field && field.toLowerCase().includes(searchTerm)
+            );
+        });
+        
+        renderBikesTable(searchResults);
+        
+    } catch (error) {
+        console.error('Error searching bikes:', error);
+        tableContainer.innerHTML = '<div class="error">Error searching bikes. Please try again.</div>';
+    }
+}
+
+// Load donors table
+async function loadDonorsTable() {
+    const tableContainer = document.getElementById('bikesTable');
+    if (!tableContainer) return;
+
+    tableContainer.innerHTML = '<div class="loading">Loading donors...</div>';
+
+    try {
+        if (!window.supabaseClient) {
+            throw new Error('Supabase client not initialized');
+        }
+
+        const { data: donors, error } = await window.supabaseClient
+            .from('donors')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        renderDonorsTable(donors);
+        
+    } catch (error) {
+        console.error('Error loading donors table:', error);
+        tableContainer.innerHTML = '<div class="error">Error loading donors. Please try again.</div>';
+    }
+}
+
+// Render donors table
+function renderDonorsTable(donors) {
+    const tableContainer = document.getElementById('bikesTable');
+    
+    if (donors.length === 0) {
+        tableContainer.innerHTML = '<div class="no-data">No donors found.</div>';
+        return;
+    }
+
+    const table = document.createElement('table');
+    table.className = 'bikes-table';
+    
+    table.innerHTML = `
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${donors.map(donor => `
+                <tr>
+                    <td>${donor.name || 'N/A'}</td>
+                    <td>${donor.email || 'N/A'}</td>
+                    <td>${donor.created_at ? new Date(donor.created_at).toLocaleDateString() : 'N/A'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="viewDonor('${donor.id}')">View</button>
+                        ${window.roleManager.hasPermission('update') ? `<button class="btn btn-sm btn-secondary" onclick="editDonor('${donor.id}')">Edit</button>` : ''}
+                    </td>
+                </tr>
+            `).join('')}
+        </tbody>
+    `;
+    
+    tableContainer.innerHTML = '';
+    tableContainer.appendChild(table);
 }
 
 // Edit bike function
@@ -395,10 +495,28 @@ async function deleteBike(bikeId) {
     }
 }
 
+// View donor function
+async function viewDonor(donorId) {
+    alert(`View donor ${donorId} - functionality to be implemented!`);
+}
+
+// Edit donor function
+async function editDonor(donorId) {
+    if (!window.roleManager.hasPermission('update')) {
+        alert('You do not have permission to edit donors.');
+        return;
+    }
+    
+    alert(`Edit donor ${donorId} - functionality to be implemented!`);
+}
+
 // Export functions for global access
 window.loadAdminInterface = loadAdminInterface;
 window.loadSalesInterface = loadSalesInterface;
 window.loadBikesTable = loadBikesTable;
+window.performBikeSearch = performBikeSearch;
+window.loadDonorsTable = loadDonorsTable;
 window.editBike = editBike;
 window.deleteBike = deleteBike;
-window.openDonorForm = openDonorForm;
+window.viewDonor = viewDonor;
+window.editDonor = editDonor;

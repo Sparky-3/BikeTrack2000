@@ -211,6 +211,9 @@ class RoleManager {
             if (filters.status) {
                 query = query.eq('status', filters.status);
             }
+            if (filters.statusNotIn) {
+                query = query.not('status', 'in', `(${filters.statusNotIn.join(',')})`);
+            }
             if (filters.type) {
                 query = query.eq('type', filters.type);
             }
