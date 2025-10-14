@@ -178,6 +178,8 @@ body:has(.donation-form) .header {
     max-width: 1000px;
     margin: 0 auto;
     position: relative;
+    max-height: 600px;
+    overflow-y: auto;
 }
 
 .criteria-table-container::before {
@@ -204,6 +206,12 @@ body:has(.donation-form) .header {
     text-transform: uppercase;
     letter-spacing: 1px;
     text-shadow: 1px 1px 0px #fef3c7;
+    position: sticky;
+    top: 0;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    z-index: 11;
+    margin-top: 0;
+    padding-top: 0.5rem;
 }
 
 .criteria-table {
@@ -225,6 +233,9 @@ body:has(.donation-form) .header {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     text-shadow: 1px 1px 0px #0f172a;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .criteria-table th:first-child {
@@ -1035,7 +1046,9 @@ body:has(.donation-form) .header {
     margin-bottom: 2rem;
     box-shadow: 8px 8px 0px #1e3a8a;
     border: 3px solid #1e3a8a;
-    position: relative;
+    position: sticky;
+    top: 65px;
+    z-index: 50;
     font-family: 'Courier New', monospace;
 }
 
@@ -1124,6 +1137,8 @@ body:has(.donation-form) .header {
     border: 3px solid #1e3a8a;
     position: relative;
     font-family: 'Courier New', monospace;
+    max-height: calc(100vh - 450px);
+    overflow-y: auto;
 }
 
 .bikes-table-container::before {
@@ -1143,6 +1158,17 @@ body:has(.donation-form) .header {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
+    position: sticky;
+    top: 0;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    z-index: 11;
+    padding: 0.5rem 0;
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    margin-top: -1.5rem;
+    padding-top: 1.5rem;
 }
 
 .table-header h3 {
@@ -1164,22 +1190,17 @@ body:has(.donation-form) .header {
 }
 
 .bikes-table thead {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
+    position: sticky;
+    top: 68px;
+    z-index: 10;
 }
 
 .bikes-table tbody {
-    display: block;
-    max-height: 500px;
-    overflow-y: auto;
     width: 100%;
 }
 
 .bikes-table tbody tr {
-    display: table;
     width: 100%;
-    table-layout: fixed;
 }
 
 .bikes-table th,
