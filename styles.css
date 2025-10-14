@@ -1228,6 +1228,14 @@ body:has(.donation-form) .header {
     max-width: 150px;
 }
 
+/* Actions column - allow buttons to display properly */
+.bikes-table td:last-child {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: initial;
+    min-width: 180px;
+}
+
 .status-badge {
     display: inline-block;
     padding: 0.25rem 0.75rem;
