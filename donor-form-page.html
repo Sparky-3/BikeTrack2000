@@ -147,101 +147,19 @@
                         <label for="donationType">Donation Type *</label>
                         <select id="donationType" required>
                             <option value="">Select donation type</option>
-                            <option value="bike">Bike</option>
+                            <option value="bike">Bike(s)</option>
                             <option value="parts">Parts</option>
-                            <option value="both">Bike and Parts</option>
+                            <option value="both">Bike(s) and Parts</option>
                         </select>
                     </div>
                     
-                    <div id="bikeSection" class="donation-section" style="display: none;">
-                        <h3>Bike Information</h3>
-                        
-                        <div class="form-group">
-                            <label for="bikeBrand">Brand</label>
-                            <input type="text" id="bikeBrand">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="bikeModel">Model</label>
-                            <input type="text" id="bikeModel">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="bikeType">Type</label>
-                            <select id="bikeType">
-                                <option value="">Select bike type</option>
-                                <option value="road">Road Bike</option>
-                                <option value="mountain">Mountain Bike</option>
-                                <option value="hybrid">Hybrid</option>
-                                <option value="cruiser">Cruiser</option>
-                                <option value="bmx">BMX</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="bikeSize">Size</label>
-                            <input type="text" id="bikeSize">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="bikeCondition">Condition</label>
-                            <select id="bikeCondition">
-                                <option value="">Select condition</option>
-                                <option value="excellent">Excellent</option>
-                                <option value="good">Good</option>
-                                <option value="fair">Fair</option>
-                                <option value="poor">Poor</option>
-                                <option value="needs_repair">Needs Repair</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="bikeValue">Estimated Value ($)</label>
-                            <input type="number" id="bikeValue" min="0" step="0.01">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="bikeSerialNumber">Serial Number</label>
-                            <input type="text" id="bikeSerialNumber">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="bikeNotes">Notes</label>
-                            <textarea id="bikeNotes" rows="3" placeholder="Any additional information about the bike..."></textarea>
-                        </div>
+                    <div class="form-group">
+                        <label for="numberOfDonations">Number of Donations *</label>
+                        <input type="number" id="numberOfDonations" min="1" max="20" value="1" required>
+                        <small style="color: #1e3a8a; font-style: italic;">How many items are being donated?</small>
                     </div>
                     
-                    <div id="partsSection" class="donation-section" style="display: none;">
-                        <h3>Parts Information</h3>
-                        
-                        <div class="form-group">
-                            <label for="partsDescription">Parts Description</label>
-                            <textarea id="partsDescription" rows="3" placeholder="Describe the parts being donated..."></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="numberOfParts">Number of Parts</label>
-                            <input type="number" id="numberOfParts" min="1" value="1">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="partsValue">Estimated Value ($)</label>
-                            <input type="number" id="partsValue" min="0" step="0.01">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="partsCondition">Condition</label>
-                            <select id="partsCondition">
-                                <option value="">Select condition</option>
-                                <option value="new">New</option>
-                                <option value="excellent">Excellent</option>
-                                <option value="good">Good</option>
-                                <option value="fair">Fair</option>
-                                <option value="poor">Poor</option>
-                            </select>
-                        </div>
-                    </div>
+                    <div id="dynamicDonationSections"></div>
                     
                     <div class="form-group">
                         <label for="donationNotes">Additional Notes</label>
@@ -252,13 +170,6 @@
                         <label class="checkbox-label">
                             <input type="checkbox" id="receiptRequested" checked>
                             I would like a receipt for this donation
-                        </label>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="taxDeductible">
-                            This donation is tax deductible
                         </label>
                     </div>
                     
@@ -291,31 +202,140 @@
     <script src="config.js"></script>
     <script src="env-config.js"></script>
     <script>
-        // Handle donation type change
-        const donationType = document.getElementById('donationType');
-        if (donationType) {
-            donationType.addEventListener('change', function() {
-                const bikeSection = document.getElementById('bikeSection');
-                const partsSection = document.getElementById('partsSection');
-                
-                // Hide both sections first
-                if (bikeSection) bikeSection.style.display = 'none';
-                if (partsSection) partsSection.style.display = 'none';
-                
-                // Show relevant sections based on selection
-                switch (this.value) {
-                    case 'bike':
-                        if (bikeSection) bikeSection.style.display = 'block';
-                        break;
-                    case 'parts':
-                        if (partsSection) partsSection.style.display = 'block';
-                        break;
-                    case 'both':
-                        if (bikeSection) bikeSection.style.display = 'block';
-                        if (partsSection) partsSection.style.display = 'block';
-                        break;
+        // Generate dynamic donation sections based on type and count
+        function generateDonationSections() {
+            const donationType = document.getElementById('donationType').value;
+            const numberOfDonations = parseInt(document.getElementById('numberOfDonations').value) || 1;
+            const container = document.getElementById('dynamicDonationSections');
+            
+            if (!donationType) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            for (let i = 1; i <= numberOfDonations; i++) {
+                if (donationType === 'bike' || donationType === 'both') {
+                    container.innerHTML += generateBikeSection(i);
                 }
-            });
+                if (donationType === 'parts' || donationType === 'both') {
+                    container.innerHTML += generatePartsSection(i);
+                }
+            }
+        }
+        
+        // Generate a bike section HTML
+        function generateBikeSection(index) {
+            return `
+                <div class="donation-section">
+                    <h3>Bike ${index}</h3>
+                    
+                    <div class="form-group">
+                        <label for="bikeBrand_${index}">Brand</label>
+                        <input type="text" id="bikeBrand_${index}" name="bikeBrand_${index}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bikeModel_${index}">Model</label>
+                        <input type="text" id="bikeModel_${index}" name="bikeModel_${index}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bikeType_${index}">Type</label>
+                        <select id="bikeType_${index}" name="bikeType_${index}">
+                            <option value="">Select bike type</option>
+                            <option value="road">Road Bike</option>
+                            <option value="mountain">Mountain Bike</option>
+                            <option value="hybrid">Hybrid</option>
+                            <option value="cruiser">Cruiser</option>
+                            <option value="bmx">BMX</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bikeSize_${index}">Size</label>
+                        <input type="text" id="bikeSize_${index}" name="bikeSize_${index}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bikeCondition_${index}">Condition</label>
+                        <select id="bikeCondition_${index}" name="bikeCondition_${index}">
+                            <option value="">Select condition</option>
+                            <option value="excellent">Excellent</option>
+                            <option value="good">Good</option>
+                            <option value="fair">Fair</option>
+                            <option value="poor">Poor</option>
+                            <option value="needs_repair">Needs Repair</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bikeValue_${index}">Estimated Value ($)</label>
+                        <input type="number" id="bikeValue_${index}" name="bikeValue_${index}" min="0" step="0.01">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bikeSerialNumber_${index}">Serial Number</label>
+                        <input type="text" id="bikeSerialNumber_${index}" name="bikeSerialNumber_${index}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bikeNotes_${index}">Notes</label>
+                        <textarea id="bikeNotes_${index}" name="bikeNotes_${index}" rows="3" placeholder="Any additional information about this bike..."></textarea>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Generate a parts section HTML
+        function generatePartsSection(index) {
+            return `
+                <div class="donation-section">
+                    <h3>Parts ${index}</h3>
+                    
+                    <div class="form-group">
+                        <label for="partsDescription_${index}">Parts Description</label>
+                        <textarea id="partsDescription_${index}" name="partsDescription_${index}" rows="3" placeholder="Describe the parts being donated..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="numberOfParts_${index}">Number of Parts</label>
+                        <input type="number" id="numberOfParts_${index}" name="numberOfParts_${index}" min="1" value="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="partsValue_${index}">Estimated Value ($)</label>
+                        <input type="number" id="partsValue_${index}" name="partsValue_${index}" min="0" step="0.01">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="partsCondition_${index}">Condition</label>
+                        <select id="partsCondition_${index}" name="partsCondition_${index}">
+                            <option value="">Select condition</option>
+                            <option value="new">New</option>
+                            <option value="excellent">Excellent</option>
+                            <option value="good">Good</option>
+                            <option value="fair">Fair</option>
+                            <option value="poor">Poor</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Handle donation type and number changes
+        const donationType = document.getElementById('donationType');
+        const numberOfDonations = document.getElementById('numberOfDonations');
+        
+        if (donationType) {
+            donationType.addEventListener('change', generateDonationSections);
+        }
+        
+        if (numberOfDonations) {
+            numberOfDonations.addEventListener('change', generateDonationSections);
+            numberOfDonations.addEventListener('input', generateDonationSections);
         }
 
         // Handle form submission
@@ -323,6 +343,9 @@
         if (form) {
             form.addEventListener('submit', async function(event) {
                 event.preventDefault();
+                
+                const donationType = document.getElementById('donationType').value;
+                const numberOfDonations = parseInt(document.getElementById('numberOfDonations').value) || 1;
                 
                 // Get form data
                 const formData = {
@@ -333,36 +356,42 @@
                         address: document.getElementById('donorAddress').value
                     },
                     donation: {
-                        type: document.getElementById('donationType').value,
+                        type: donationType,
                         notes: document.getElementById('donationNotes').value,
-                        receiptRequested: document.getElementById('receiptRequested').checked,
-                        taxDeductible: document.getElementById('taxDeductible').checked
-                    }
+                        receiptRequested: document.getElementById('receiptRequested').checked
+                    },
+                    bikes: [],
+                    parts: []
                 };
                 
-                // Add bike information if applicable
-                const donationType = formData.donation.type;
+                // Collect bike information if applicable
                 if (donationType === 'bike' || donationType === 'both') {
-                    formData.bike = {
-                        brand: document.getElementById('bikeBrand').value,
-                        model: document.getElementById('bikeModel').value,
-                        type: document.getElementById('bikeType').value,
-                        size: document.getElementById('bikeSize').value,
-                        condition: document.getElementById('bikeCondition').value,
-                        value: parseFloat(document.getElementById('bikeValue').value) || 0,
-                        serialNumber: document.getElementById('bikeSerialNumber').value,
-                        notes: document.getElementById('bikeNotes').value
-                    };
+                    for (let i = 1; i <= numberOfDonations; i++) {
+                        const bike = {
+                            brand: document.getElementById(`bikeBrand_${i}`)?.value || '',
+                            model: document.getElementById(`bikeModel_${i}`)?.value || '',
+                            type: document.getElementById(`bikeType_${i}`)?.value || '',
+                            size: document.getElementById(`bikeSize_${i}`)?.value || '',
+                            condition: document.getElementById(`bikeCondition_${i}`)?.value || '',
+                            value: parseFloat(document.getElementById(`bikeValue_${i}`)?.value) || 0,
+                            serialNumber: document.getElementById(`bikeSerialNumber_${i}`)?.value || '',
+                            notes: document.getElementById(`bikeNotes_${i}`)?.value || ''
+                        };
+                        formData.bikes.push(bike);
+                    }
                 }
                 
-                // Add parts information if applicable
+                // Collect parts information if applicable
                 if (donationType === 'parts' || donationType === 'both') {
-                    formData.parts = {
-                        description: document.getElementById('partsDescription').value,
-                        numberOfParts: parseInt(document.getElementById('numberOfParts').value) || 1,
-                        value: parseFloat(document.getElementById('partsValue').value) || 0,
-                        condition: document.getElementById('partsCondition').value
-                    };
+                    for (let i = 1; i <= numberOfDonations; i++) {
+                        const parts = {
+                            description: document.getElementById(`partsDescription_${i}`)?.value || '',
+                            numberOfParts: parseInt(document.getElementById(`numberOfParts_${i}`)?.value) || 1,
+                            value: parseFloat(document.getElementById(`partsValue_${i}`)?.value) || 0,
+                            condition: document.getElementById(`partsCondition_${i}`)?.value || ''
+                        };
+                        formData.parts.push(parts);
+                    }
                 }
                 
                 try {
@@ -385,8 +414,7 @@
                     
                     // Reset form
                     form.reset();
-                    document.getElementById('bikeSection').style.display = 'none';
-                    document.getElementById('partsSection').style.display = 'none';
+                    document.getElementById('dynamicDonationSections').innerHTML = '';
                     
                     // Scroll to top to see success message
                     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -431,13 +459,19 @@
                 
                 if (donorError) throw donorError;
                 
+                // Calculate total values
+                const totalBikes = formData.bikes.length;
+                const totalBikeValue = formData.bikes.reduce((sum, bike) => sum + (bike.value || 0), 0);
+                const totalPartsValue = formData.parts.reduce((sum, parts) => sum + (parts.value || 0), 0);
+                const totalPartsCount = formData.parts.reduce((sum, parts) => sum + (parts.numberOfParts || 0), 0);
+                
                 // Create donation record
                 const donationRecord = {
                     email: formData.donor.email,
                     name: formData.donor.name,
-                    total_bikes_donated: (formData.bike ? 1 : 0),
-                    total_estimated_value: (formData.bike?.value || 0) + (formData.parts?.value || 0),
-                    total_parts_donated: formData.parts?.numberOfParts || 0
+                    total_bikes_donated: totalBikes,
+                    total_estimated_value: totalBikeValue + totalPartsValue,
+                    total_parts_donated: totalPartsCount
                 };
                 
                 const { data: donationData, error: donationError } = await window.supabaseClient
@@ -448,31 +482,31 @@
                 
                 if (donationError) throw donationError;
                 
-                // Create bike record if applicable
-                if (formData.bike && (formData.donation.type === 'bike' || formData.donation.type === 'both')) {
-                    const bikeRecord = {
-                        brand: formData.bike.brand,
-                        model: formData.bike.model,
-                        value: formData.bike.value
-                    };
+                // Create bike records if applicable
+                if (formData.bikes.length > 0) {
+                    const bikeRecords = formData.bikes.map(bike => ({
+                        brand: bike.brand,
+                        model: bike.model,
+                        value: bike.value
+                    }));
                     
                     const { error: bikeError } = await window.supabaseClient
                         .from('bikes_donated')
-                        .insert([bikeRecord]);
+                        .insert(bikeRecords);
                     
                     if (bikeError) throw bikeError;
                 }
                 
-                // Create parts record if applicable
-                if (formData.parts && (formData.donation.type === 'parts' || formData.donation.type === 'both')) {
-                    const partsRecord = {
-                        number_of_parts: formData.parts.numberOfParts,
-                        parts_value: formData.parts.value
-                    };
+                // Create parts records if applicable
+                if (formData.parts.length > 0) {
+                    const partsRecords = formData.parts.map(parts => ({
+                        number_of_parts: parts.numberOfParts,
+                        parts_value: parts.value
+                    }));
                     
                     const { error: partsError } = await window.supabaseClient
                         .from('parts_donated')
-                        .insert([partsRecord]);
+                        .insert(partsRecords);
                     
                     if (partsError) throw partsError;
                 }
@@ -488,8 +522,7 @@
         // Reset form function
         function resetForm() {
             document.getElementById('donorForm').reset();
-            document.getElementById('bikeSection').style.display = 'none';
-            document.getElementById('partsSection').style.display = 'none';
+            document.getElementById('dynamicDonationSections').innerHTML = '';
             document.getElementById('successMessage').style.display = 'none';
         }
     </script>
