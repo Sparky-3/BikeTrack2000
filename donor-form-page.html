@@ -153,10 +153,16 @@
                         </select>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="numberOfDonations">Number of Donations *</label>
-                        <input type="number" id="numberOfDonations" min="1" max="20" value="1" required>
-                        <small style="color: #1e3a8a; font-style: italic;">How many items are being donated?</small>
+                    <div class="form-group" id="numberOfBikesGroup" style="display: none;">
+                        <label for="numberOfBikes">Number of Bikes *</label>
+                        <input type="number" id="numberOfBikes" min="1" max="20" value="1">
+                        <small style="color: #1e3a8a; font-style: italic;">How many bikes are being donated?</small>
+                    </div>
+                    
+                    <div class="form-group" id="numberOfPartsGroup" style="display: none;">
+                        <label for="numberOfParts">Number of Parts *</label>
+                        <input type="number" id="numberOfParts" min="1" max="100" value="1">
+                        <small style="color: #1e3a8a; font-style: italic;">Total number of parts being donated</small>
                     </div>
                     
                     <div id="dynamicDonationSections"></div>
@@ -205,23 +211,46 @@
         // Generate dynamic donation sections based on type and count
         function generateDonationSections() {
             const donationType = document.getElementById('donationType').value;
-            const numberOfDonations = parseInt(document.getElementById('numberOfDonations').value) || 1;
             const container = document.getElementById('dynamicDonationSections');
+            const numberOfBikesGroup = document.getElementById('numberOfBikesGroup');
+            const numberOfPartsGroup = document.getElementById('numberOfPartsGroup');
             
-            if (!donationType) {
+            // Show/hide number input fields based on donation type
+            if (donationType === 'bike') {
+                numberOfBikesGroup.style.display = 'block';
+                numberOfPartsGroup.style.display = 'none';
+                document.getElementById('numberOfBikes').required = true;
+                document.getElementById('numberOfParts').required = false;
+            } else if (donationType === 'parts') {
+                numberOfBikesGroup.style.display = 'none';
+                numberOfPartsGroup.style.display = 'block';
+                document.getElementById('numberOfBikes').required = false;
+                document.getElementById('numberOfParts').required = true;
+            } else if (donationType === 'both') {
+                numberOfBikesGroup.style.display = 'block';
+                numberOfPartsGroup.style.display = 'block';
+                document.getElementById('numberOfBikes').required = true;
+                document.getElementById('numberOfParts').required = true;
+            } else {
+                numberOfBikesGroup.style.display = 'none';
+                numberOfPartsGroup.style.display = 'none';
                 container.innerHTML = '';
                 return;
             }
             
+            // Generate sections
             container.innerHTML = '';
             
-            for (let i = 1; i <= numberOfDonations; i++) {
-                if (donationType === 'bike' || donationType === 'both') {
+            if (donationType === 'bike' || donationType === 'both') {
+                const numberOfBikes = parseInt(document.getElementById('numberOfBikes').value) || 1;
+                for (let i = 1; i <= numberOfBikes; i++) {
                     container.innerHTML += generateBikeSection(i);
                 }
-                if (donationType === 'parts' || donationType === 'both') {
-                    container.innerHTML += generatePartsSection(i);
-                }
+            }
+            
+            if (donationType === 'parts' || donationType === 'both') {
+                // For parts, we just generate one section since the number is captured at the top
+                container.innerHTML += generatePartsSection();
             }
         }
         
@@ -290,29 +319,24 @@
         }
         
         // Generate a parts section HTML
-        function generatePartsSection(index) {
+        function generatePartsSection() {
             return `
                 <div class="donation-section">
-                    <h3>Parts ${index}</h3>
+                    <h3>Parts Information</h3>
                     
                     <div class="form-group">
-                        <label for="partsDescription_${index}">Parts Description</label>
-                        <textarea id="partsDescription_${index}" name="partsDescription_${index}" rows="3" placeholder="Describe the parts being donated..."></textarea>
+                        <label for="partsDescription">Parts Description</label>
+                        <textarea id="partsDescription" name="partsDescription" rows="3" placeholder="Describe the parts being donated..."></textarea>
                     </div>
                     
                     <div class="form-group">
-                        <label for="numberOfParts_${index}">Number of Parts</label>
-                        <input type="number" id="numberOfParts_${index}" name="numberOfParts_${index}" min="1" value="1">
+                        <label for="partsValue">Estimated Value ($)</label>
+                        <input type="number" id="partsValue" name="partsValue" min="0" step="0.01">
                     </div>
                     
                     <div class="form-group">
-                        <label for="partsValue_${index}">Estimated Value ($)</label>
-                        <input type="number" id="partsValue_${index}" name="partsValue_${index}" min="0" step="0.01">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="partsCondition_${index}">Condition</label>
-                        <select id="partsCondition_${index}" name="partsCondition_${index}">
+                        <label for="partsCondition">Condition</label>
+                        <select id="partsCondition" name="partsCondition">
                             <option value="">Select condition</option>
                             <option value="new">New</option>
                             <option value="excellent">Excellent</option>
@@ -327,15 +351,21 @@
         
         // Handle donation type and number changes
         const donationType = document.getElementById('donationType');
-        const numberOfDonations = document.getElementById('numberOfDonations');
+        const numberOfBikes = document.getElementById('numberOfBikes');
+        const numberOfParts = document.getElementById('numberOfParts');
         
         if (donationType) {
             donationType.addEventListener('change', generateDonationSections);
         }
         
-        if (numberOfDonations) {
-            numberOfDonations.addEventListener('change', generateDonationSections);
-            numberOfDonations.addEventListener('input', generateDonationSections);
+        if (numberOfBikes) {
+            numberOfBikes.addEventListener('change', generateDonationSections);
+            numberOfBikes.addEventListener('input', generateDonationSections);
+        }
+        
+        if (numberOfParts) {
+            numberOfParts.addEventListener('change', generateDonationSections);
+            numberOfParts.addEventListener('input', generateDonationSections);
         }
 
         // Handle form submission
@@ -345,7 +375,8 @@
                 event.preventDefault();
                 
                 const donationType = document.getElementById('donationType').value;
-                const numberOfDonations = parseInt(document.getElementById('numberOfDonations').value) || 1;
+                const numberOfBikes = parseInt(document.getElementById('numberOfBikes').value) || 0;
+                const numberOfParts = parseInt(document.getElementById('numberOfParts').value) || 0;
                 
                 // Get form data
                 const formData = {
@@ -361,12 +392,13 @@
                         receiptRequested: document.getElementById('receiptRequested').checked
                     },
                     bikes: [],
-                    parts: []
+                    parts: null,
+                    numberOfParts: numberOfParts
                 };
                 
                 // Collect bike information if applicable
                 if (donationType === 'bike' || donationType === 'both') {
-                    for (let i = 1; i <= numberOfDonations; i++) {
+                    for (let i = 1; i <= numberOfBikes; i++) {
                         const bike = {
                             brand: document.getElementById(`bikeBrand_${i}`)?.value || '',
                             model: document.getElementById(`bikeModel_${i}`)?.value || '',
@@ -383,15 +415,12 @@
                 
                 // Collect parts information if applicable
                 if (donationType === 'parts' || donationType === 'both') {
-                    for (let i = 1; i <= numberOfDonations; i++) {
-                        const parts = {
-                            description: document.getElementById(`partsDescription_${i}`)?.value || '',
-                            numberOfParts: parseInt(document.getElementById(`numberOfParts_${i}`)?.value) || 1,
-                            value: parseFloat(document.getElementById(`partsValue_${i}`)?.value) || 0,
-                            condition: document.getElementById(`partsCondition_${i}`)?.value || ''
-                        };
-                        formData.parts.push(parts);
-                    }
+                    formData.parts = {
+                        description: document.getElementById('partsDescription')?.value || '',
+                        numberOfParts: numberOfParts,
+                        value: parseFloat(document.getElementById('partsValue')?.value) || 0,
+                        condition: document.getElementById('partsCondition')?.value || ''
+                    };
                 }
                 
                 try {
@@ -462,8 +491,8 @@
                 // Calculate total values
                 const totalBikes = formData.bikes.length;
                 const totalBikeValue = formData.bikes.reduce((sum, bike) => sum + (bike.value || 0), 0);
-                const totalPartsValue = formData.parts.reduce((sum, parts) => sum + (parts.value || 0), 0);
-                const totalPartsCount = formData.parts.reduce((sum, parts) => sum + (parts.numberOfParts || 0), 0);
+                const totalPartsValue = formData.parts ? (formData.parts.value || 0) : 0;
+                const totalPartsCount = formData.numberOfParts || 0;
                 
                 // Create donation record
                 const donationRecord = {
@@ -497,16 +526,16 @@
                     if (bikeError) throw bikeError;
                 }
                 
-                // Create parts records if applicable
-                if (formData.parts.length > 0) {
-                    const partsRecords = formData.parts.map(parts => ({
-                        number_of_parts: parts.numberOfParts,
-                        parts_value: parts.value
-                    }));
+                // Create parts record if applicable
+                if (formData.parts) {
+                    const partsRecord = {
+                        number_of_parts: formData.parts.numberOfParts,
+                        parts_value: formData.parts.value
+                    };
                     
                     const { error: partsError } = await window.supabaseClient
                         .from('parts_donated')
-                        .insert(partsRecords);
+                        .insert([partsRecord]);
                     
                     if (partsError) throw partsError;
                 }
