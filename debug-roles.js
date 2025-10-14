@@ -149,6 +149,31 @@ CREATE POLICY "Service role can manage all roles" ON public.user_roles
         
         console.log('=====================================');
         console.log('🏁 Diagnostic complete!');
+    },
+
+    // Quick fix - set current user to admin role
+    async setCurrentUserAdmin() {
+        console.log('🔧 Setting current user to admin role...');
+        
+        const user = await checkAuth();
+        if (!user) {
+            console.error('❌ No user logged in. Please log in first.');
+            return false;
+        }
+        
+        console.log('👤 Current user:', user.email);
+        
+        const success = await this.createTestRole(user.id, 'admin');
+        
+        if (success) {
+            console.log('✅ Successfully set role to admin!');
+            console.log('🔄 Refreshing role manager...');
+            await window.roleManager.initializeUserRole(user);
+            console.log('✅ Role manager refreshed. Try editing a bike again!');
+            return true;
+        }
+        
+        return false;
     }
 };
 
@@ -157,6 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Wait a bit for other scripts to load
     setTimeout(() => {
         console.log('🛠️ Role system debug tools loaded. Run window.debugRoles.runDiagnostic() to troubleshoot.');
+        console.log('🚑 Quick fix: Run window.debugRoles.setCurrentUserAdmin() to set yourself as admin.');
     }, 1000);
 });
 
