@@ -313,16 +313,16 @@ function renderBikesTable(bikes) {
     table.innerHTML = `
         <thead>
             <tr>
-                <th>Serial Number</th>
+                <th>Serial #</th>
                 <th>Brand</th>
                 <th>Model</th>
                 <th>Type</th>
                 <th>Size</th>
-                <th>Value</th>
+                <th>Est. Value</th>
                 <th>Program</th>
                 <th>Condition</th>
                 <th>Status</th>
-                <th>Donated To</th>
+                <th>Recipient</th>
                 <th>Notes</th>
                 <th>Actions</th>
             </tr>
