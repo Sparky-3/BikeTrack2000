@@ -211,15 +211,18 @@
         // Store brands and models globally
         window.bikeBrands = [];
         window.bikeModels = [];
+        window.brandsModelsLoaded = false;
         
         // Fetch brands and models from database
         async function loadBrandsAndModels() {
             if (!window.supabaseClient) {
                 console.error('Supabase client not initialized');
-                return;
+                return false;
             }
             
             try {
+                console.log('Loading brands and models from database...');
+                
                 // Fetch brands
                 const { data: brands, error: brandsError } = await window.supabaseClient
                     .from('brands')
@@ -227,7 +230,8 @@
                     .order('name', { ascending: true });
                 
                 if (brandsError) throw brandsError;
-                window.bikeBrands = brands.map(b => b.name);
+                window.bikeBrands = brands ? brands.map(b => b.name) : [];
+                console.log('Loaded brands:', window.bikeBrands.length, window.bikeBrands);
                 
                 // Fetch models
                 const { data: models, error: modelsError } = await window.supabaseClient
@@ -236,23 +240,47 @@
                     .order('name', { ascending: true });
                 
                 if (modelsError) throw modelsError;
-                window.bikeModels = models.map(m => m.name);
+                window.bikeModels = models ? models.map(m => m.name) : [];
+                console.log('Loaded models:', window.bikeModels.length, window.bikeModels);
+                
+                window.brandsModelsLoaded = true;
+                return true;
                 
             } catch (error) {
                 console.error('Error loading brands and models:', error);
+                return false;
             }
         }
         
         // Load brands and models when page loads
-        window.addEventListener('DOMContentLoaded', loadBrandsAndModels);
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Wait a bit for Supabase client to initialize
+            let retries = 0;
+            while (!window.supabaseClient && retries < 10) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+            
+            if (window.supabaseClient) {
+                await loadBrandsAndModels();
+            } else {
+                console.error('Supabase client not available after waiting');
+            }
+        });
     </script>
     <script>
         // Generate dynamic donation sections based on type and count
-        function generateDonationSections() {
+        async function generateDonationSections() {
             const donationType = document.getElementById('donationType').value;
             const container = document.getElementById('dynamicDonationSections');
             const numberOfBikesGroup = document.getElementById('numberOfBikesGroup');
             const numberOfPartsGroup = document.getElementById('numberOfPartsGroup');
+            
+            // Ensure brands and models are loaded before generating bike sections
+            if (!window.brandsModelsLoaded) {
+                console.log('Brands and models not loaded yet, loading now...');
+                await loadBrandsAndModels();
+            }
             
             // Show/hide number input fields based on donation type
             if (donationType === 'bike') {
@@ -302,13 +330,19 @@
         
         // Generate a bike section HTML
         function generateBikeSection(index) {
-            const brandsOptions = window.bikeBrands.map(brand => 
-                `<option value="${brand}">${brand}</option>`
-            ).join('');
+            console.log('Generating bike section', index, 'with brands:', window.bikeBrands.length, 'and models:', window.bikeModels.length);
             
-            const modelsOptions = window.bikeModels.map(model => 
-                `<option value="${model}">${model}</option>`
-            ).join('');
+            const brandsOptions = window.bikeBrands && window.bikeBrands.length > 0
+                ? window.bikeBrands.map(brand => 
+                    `<option value="${brand}">${brand}</option>`
+                  ).join('')
+                : '<option value="" disabled>Loading brands...</option>';
+            
+            const modelsOptions = window.bikeModels && window.bikeModels.length > 0
+                ? window.bikeModels.map(model => 
+                    `<option value="${model}">${model}</option>`
+                  ).join('')
+                : '<option value="" disabled>Loading models...</option>';
             
             return `
                 <div class="donation-section">
