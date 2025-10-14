@@ -215,12 +215,8 @@ function setupAdminEventListeners() {
     const donorFormBtn = document.getElementById('donorFormBtn');
     if (donorFormBtn) {
         donorFormBtn.addEventListener('click', () => {
-            // Call the global donor form function from donor-form.js
-            if (typeof window.openDonorForm === 'function') {
-                window.openDonorForm();
-            } else {
-                alert('Donor form functionality is not available.');
-            }
+            // Navigate to the donor form page
+            window.location.href = 'donor-form-page.html';
         });
     }
 }

@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phoenix Bikes - Donor Form</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Additional styles specific to donor form page */
+        .donor-form-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 0;
+        }
+
+        .donor-form-header {
+            background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
+            box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 3px solid #1e3a8a;
+            margin-bottom: 2rem;
+        }
+
+        .donor-form-header h1 {
+            color: #fef3c7;
+            font-size: 2rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 0px #1e3a8a;
+            letter-spacing: 1px;
+            font-family: 'Courier New', monospace;
+            margin: 0;
+        }
+
+        .donor-form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            flex: 1;
+        }
+
+        .donor-form-content {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 2.5rem;
+            border-radius: 0;
+            box-shadow: 8px 8px 0px #1e3a8a;
+            border: 3px solid #1e3a8a;
+            position: relative;
+        }
+
+        .donor-form-content::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(45deg, #3b82f6, #1e3a8a, #3b82f6);
+            z-index: -1;
+            border-radius: 0;
+        }
+
+        .donor-form-footer {
+            margin-top: 2rem;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .back-to-admin {
+            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+            color: #fef3c7;
+            border: 2px solid #475569;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 0px #334155;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-to-admin:hover {
+            background: linear-gradient(135deg, #475569 0%, #64748b 100%);
+            box-shadow: 3px 3px 0px #334155;
+            transform: translate(-1px, -1px);
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #fef3c7;
+            padding: 1.5rem;
+            border-radius: 0;
+            border: 3px solid #059669;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 8px 8px 0px #059669;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 0px #064e3b;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="donor-form-page">
+        <div class="donor-form-header">
+            <h1>Donation Form</h1>
+            <p style="color: #fef3c7; margin-top: 0.5rem; font-family: 'Courier New', monospace;">Thank you for your donation to Phoenix Bikes!</p>
+        </div>
+
+        <div class="donor-form-container">
+            <div id="successMessage" class="success-message">
+                Donation submitted successfully! Thank you for your generosity.
+            </div>
+
+            <div class="donor-form-content">
+                <form id="donorForm" class="donation-form">
+                    <div class="form-group">
+                        <label for="donorName">Donor Name *</label>
+                        <input type="text" id="donorName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="donorEmail">Email Address *</label>
+                        <input type="email" id="donorEmail" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="donorPhone">Phone Number</label>
+                        <input type="tel" id="donorPhone">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="donorAddress">Address</label>
+                        <textarea id="donorAddress" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="donationType">Donation Type *</label>
+                        <select id="donationType" required>
+                            <option value="">Select donation type</option>
+                            <option value="bike">Bike</option>
+                            <option value="parts">Parts</option>
+                            <option value="both">Bike and Parts</option>
+                        </select>
+                    </div>
+                    
+                    <div id="bikeSection" class="donation-section" style="display: none;">
+                        <h3>Bike Information</h3>
+                        
+                        <div class="form-group">
+                            <label for="bikeBrand">Brand</label>
+                            <input type="text" id="bikeBrand">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bikeModel">Model</label>
+                            <input type="text" id="bikeModel">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bikeType">Type</label>
+                            <select id="bikeType">
+                                <option value="">Select bike type</option>
+                                <option value="road">Road Bike</option>
+                                <option value="mountain">Mountain Bike</option>
+                                <option value="hybrid">Hybrid</option>
+                                <option value="cruiser">Cruiser</option>
+                                <option value="bmx">BMX</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bikeSize">Size</label>
+                            <input type="text" id="bikeSize">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bikeCondition">Condition</label>
+                            <select id="bikeCondition">
+                                <option value="">Select condition</option>
+                                <option value="excellent">Excellent</option>
+                                <option value="good">Good</option>
+                                <option value="fair">Fair</option>
+                                <option value="poor">Poor</option>
+                                <option value="needs_repair">Needs Repair</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bikeValue">Estimated Value ($)</label>
+                            <input type="number" id="bikeValue" min="0" step="0.01">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bikeSerialNumber">Serial Number</label>
+                            <input type="text" id="bikeSerialNumber">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bikeNotes">Notes</label>
+                            <textarea id="bikeNotes" rows="3" placeholder="Any additional information about the bike..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div id="partsSection" class="donation-section" style="display: none;">
+                        <h3>Parts Information</h3>
+                        
+                        <div class="form-group">
+                            <label for="partsDescription">Parts Description</label>
+                            <textarea id="partsDescription" rows="3" placeholder="Describe the parts being donated..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="numberOfParts">Number of Parts</label>
+                            <input type="number" id="numberOfParts" min="1" value="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="partsValue">Estimated Value ($)</label>
+                            <input type="number" id="partsValue" min="0" step="0.01">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="partsCondition">Condition</label>
+                            <select id="partsCondition">
+                                <option value="">Select condition</option>
+                                <option value="new">New</option>
+                                <option value="excellent">Excellent</option>
+                                <option value="good">Good</option>
+                                <option value="fair">Fair</option>
+                                <option value="poor">Poor</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="donationNotes">Additional Notes</label>
+                        <textarea id="donationNotes" rows="3" placeholder="Any additional information about the donation..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="receiptRequested" checked>
+                            I would like a receipt for this donation
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="taxDeductible">
+                            This donation is tax deductible
+                        </label>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">Clear Form</button>
+                        <button type="submit" class="btn btn-primary">Submit Donation</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="donor-form-footer" id="returnFooter" style="display: none;">
+                <a href="index.html" class="back-to-admin">Return to Admin Interface</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Load local config for development (ignored by git) -->
+    <script>
+        // Only load local-config.js in development
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            const script = document.createElement('script');
+            script.src = 'local-config.js';
+            script.onerror = function() {
+                console.warn('⚠️ local-config.js not found - using production configuration');
+            };
+            document.head.appendChild(script);
+        }
+    </script>
+    <script src="config.js"></script>
+    <script src="env-config.js"></script>
+    <script>
+        // Handle donation type change
+        const donationType = document.getElementById('donationType');
+        if (donationType) {
+            donationType.addEventListener('change', function() {
+                const bikeSection = document.getElementById('bikeSection');
+                const partsSection = document.getElementById('partsSection');
+                
+                // Hide both sections first
+                if (bikeSection) bikeSection.style.display = 'none';
+                if (partsSection) partsSection.style.display = 'none';
+                
+                // Show relevant sections based on selection
+                switch (this.value) {
+                    case 'bike':
+                        if (bikeSection) bikeSection.style.display = 'block';
+                        break;
+                    case 'parts':
+                        if (partsSection) partsSection.style.display = 'block';
+                        break;
+                    case 'both':
+                        if (bikeSection) bikeSection.style.display = 'block';
+                        if (partsSection) partsSection.style.display = 'block';
+                        break;
+                }
+            });
+        }
+
+        // Handle form submission
+        const form = document.getElementById('donorForm');
+        if (form) {
+            form.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                
+                // Get form data
+                const formData = {
+                    donor: {
+                        name: document.getElementById('donorName').value,
+                        email: document.getElementById('donorEmail').value,
+                        phone: document.getElementById('donorPhone').value,
+                        address: document.getElementById('donorAddress').value
+                    },
+                    donation: {
+                        type: document.getElementById('donationType').value,
+                        notes: document.getElementById('donationNotes').value,
+                        receiptRequested: document.getElementById('receiptRequested').checked,
+                        taxDeductible: document.getElementById('taxDeductible').checked
+                    }
+                };
+                
+                // Add bike information if applicable
+                const donationType = formData.donation.type;
+                if (donationType === 'bike' || donationType === 'both') {
+                    formData.bike = {
+                        brand: document.getElementById('bikeBrand').value,
+                        model: document.getElementById('bikeModel').value,
+                        type: document.getElementById('bikeType').value,
+                        size: document.getElementById('bikeSize').value,
+                        condition: document.getElementById('bikeCondition').value,
+                        value: parseFloat(document.getElementById('bikeValue').value) || 0,
+                        serialNumber: document.getElementById('bikeSerialNumber').value,
+                        notes: document.getElementById('bikeNotes').value
+                    };
+                }
+                
+                // Add parts information if applicable
+                if (donationType === 'parts' || donationType === 'both') {
+                    formData.parts = {
+                        description: document.getElementById('partsDescription').value,
+                        numberOfParts: parseInt(document.getElementById('numberOfParts').value) || 1,
+                        value: parseFloat(document.getElementById('partsValue').value) || 0,
+                        condition: document.getElementById('partsCondition').value
+                    };
+                }
+                
+                try {
+                    // Show loading state
+                    const submitBtn = event.target.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.textContent = 'Submitting...';
+                    submitBtn.disabled = true;
+                    
+                    // Submit the donation
+                    await submitDonation(formData);
+                    
+                    // Show success message
+                    const successMessage = document.getElementById('successMessage');
+                    successMessage.style.display = 'block';
+                    
+                    // Show return to admin button
+                    const returnFooter = document.getElementById('returnFooter');
+                    returnFooter.style.display = 'block';
+                    
+                    // Reset form
+                    form.reset();
+                    document.getElementById('bikeSection').style.display = 'none';
+                    document.getElementById('partsSection').style.display = 'none';
+                    
+                    // Scroll to top to see success message
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    // Reset button state
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                    
+                    // Hide success message after 10 seconds (but keep return button visible)
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                    }, 10000);
+                    
+                } catch (error) {
+                    console.error('Error submitting donation:', error);
+                    alert('Error submitting donation: ' + error.message);
+                    
+                    // Reset button state
+                    const submitBtn = event.target.querySelector('button[type="submit"]');
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }
+            });
+        }
+
+        // Submit donation to database
+        async function submitDonation(formData) {
+            if (!window.supabaseClient) {
+                throw new Error('Database connection not available');
+            }
+            
+            try {
+                // Start a transaction-like process
+                const { data: donorData, error: donorError } = await window.supabaseClient
+                    .from('donors')
+                    .upsert({
+                        name: formData.donor.name,
+                        email: formData.donor.email
+                    })
+                    .select()
+                    .single();
+                
+                if (donorError) throw donorError;
+                
+                // Create donation record
+                const donationRecord = {
+                    email: formData.donor.email,
+                    name: formData.donor.name,
+                    total_bikes_donated: (formData.bike ? 1 : 0),
+                    total_estimated_value: (formData.bike?.value || 0) + (formData.parts?.value || 0),
+                    total_parts_donated: formData.parts?.numberOfParts || 0
+                };
+                
+                const { data: donationData, error: donationError } = await window.supabaseClient
+                    .from('donations')
+                    .insert([donationRecord])
+                    .select()
+                    .single();
+                
+                if (donationError) throw donationError;
+                
+                // Create bike record if applicable
+                if (formData.bike && (formData.donation.type === 'bike' || formData.donation.type === 'both')) {
+                    const bikeRecord = {
+                        brand: formData.bike.brand,
+                        model: formData.bike.model,
+                        value: formData.bike.value
+                    };
+                    
+                    const { error: bikeError } = await window.supabaseClient
+                        .from('bikes_donated')
+                        .insert([bikeRecord]);
+                    
+                    if (bikeError) throw bikeError;
+                }
+                
+                // Create parts record if applicable
+                if (formData.parts && (formData.donation.type === 'parts' || formData.donation.type === 'both')) {
+                    const partsRecord = {
+                        number_of_parts: formData.parts.numberOfParts,
+                        parts_value: formData.parts.value
+                    };
+                    
+                    const { error: partsError } = await window.supabaseClient
+                        .from('parts_donated')
+                        .insert([partsRecord]);
+                    
+                    if (partsError) throw partsError;
+                }
+                
+                return { success: true, donationId: donationData.id };
+                
+            } catch (error) {
+                console.error('Error submitting donation:', error);
+                throw error;
+            }
+        }
+
+        // Reset form function
+        function resetForm() {
+            document.getElementById('donorForm').reset();
+            document.getElementById('bikeSection').style.display = 'none';
+            document.getElementById('partsSection').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
+
