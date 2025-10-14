@@ -693,24 +693,6 @@ body:has(.donation-form) .header {
     background: #fef3c7;
 }
 
-.bikes-table tr:nth-child(even) {
-    background: #1e40af;
-}
-
-.bikes-table tr:hover {
-    background: #1e3a8a;
-}
-
-.bikes-table tr:nth-child(even) td {
-    background: #1e40af;
-    color: #1e3a8a;
-}
-
-.bikes-table tr:hover td {
-    background: #1e3a8a;
-    color: #fef3c7;
-}
-
 .work-order-btn {
     background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
     color: #fef3c7;
@@ -1156,6 +1138,25 @@ body:has(.donation-form) .header {
     table-layout: fixed;
 }
 
+.bikes-table thead {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.bikes-table tbody {
+    display: block;
+    max-height: 500px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.bikes-table tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
 .bikes-table th,
 .bikes-table td {
     padding: 0.75rem;
@@ -1174,11 +1175,21 @@ body:has(.donation-form) .header {
 }
 
 .bikes-table tbody tr:nth-child(even) {
-    background: #e6f3ff;
+    background: #fde68a;
+}
+
+.bikes-table tbody tr:nth-child(even) td {
+    background: #fde68a;
+    color: #1e3a8a;
 }
 
 .bikes-table tbody tr:hover {
-    background: #1e3a8a;
+    background: #cce7ff;
+}
+
+.bikes-table tbody tr:hover td {
+    background: #cce7ff;
+    color: #1e3a8a;
 }
 
 .bikes-table td {
