@@ -96,18 +96,12 @@ class RoleManager {
         this.currentUser = user;
         if (user) {
             this.currentRole = await this.getUserRole(user.id);
-            console.log('✅ User role initialized:', {
-                userId: user.id,
-                email: user.email,
-                role: this.currentRole,
-                roleExists: !!this.currentRole,
-                isValidRole: this.currentRole && USER_ROLES[this.currentRole] !== undefined
-            });
             
-            // Warn if role is not recognized
-            if (this.currentRole && !USER_ROLES[this.currentRole]) {
+            // Only log if there's an issue with the role
+            if (!this.currentRole) {
+                console.warn('⚠️ No role assigned to user:', user.email);
+            } else if (!USER_ROLES[this.currentRole]) {
                 console.warn('⚠️ Warning: Role "' + this.currentRole + '" is not recognized. Valid roles are:', Object.keys(USER_ROLES));
-                console.warn('💡 Trying case-insensitive match...');
                 
                 // Try case-insensitive match
                 const normalizedRole = Object.keys(USER_ROLES).find(key => 
@@ -115,7 +109,7 @@ class RoleManager {
                 );
                 
                 if (normalizedRole) {
-                    console.log('✅ Found matching role:', normalizedRole);
+                    console.log('✅ Auto-corrected role case: "' + this.currentRole + '" → "' + normalizedRole + '"');
                     this.currentRole = normalizedRole;
                 } else {
                     console.error('❌ No matching role found. User will have no permissions.');
@@ -128,16 +122,12 @@ class RoleManager {
 
     // Check if user has permission for a specific action
     hasPermission(action, resource = null) {
-        console.log('🔐 Permission check:', {
-            action,
-            resource,
-            currentRole: this.currentRole,
-            hasRole: !!this.currentRole,
-            roleIsValid: this.currentRole && USER_ROLES[this.currentRole] !== undefined
-        });
-        
         if (!this.currentRole || !USER_ROLES[this.currentRole]) {
-            console.log('❌ Permission denied: No valid role');
+            console.warn('❌ Permission denied: No valid role', {
+                action,
+                resource,
+                currentRole: this.currentRole
+            });
             return false;
         }
 
@@ -146,7 +136,6 @@ class RoleManager {
 
         // Admin has all permissions
         if (this.currentRole === 'admin') {
-            console.log('✅ Permission granted: Admin has all permissions');
             return true;
         }
 
@@ -154,13 +143,11 @@ class RoleManager {
         if (action === 'create' || action === 'read' || action === 'update' || action === 'delete') {
             // Check if user can CRUD all tables
             if (permissions.canCRUD.includes('all_tables')) {
-                console.log('✅ Permission granted: User can CRUD all tables');
                 return true;
             }
 
             // Check specific resource permissions
             if (resource && permissions.canCRUD.includes(resource)) {
-                console.log('✅ Permission granted: User can CRUD resource:', resource);
                 return true;
             }
 
@@ -168,13 +155,18 @@ class RoleManager {
             if (action === 'read') {
                 if (permissions.canRead.includes('all_tables') || 
                     (resource && permissions.canRead.includes(resource))) {
-                    console.log('✅ Permission granted: User can read resource');
                     return true;
                 }
             }
         }
 
-        console.log('❌ Permission denied: No matching permission found');
+        // Log only when permission is denied
+        console.warn('❌ Permission denied:', {
+            action,
+            resource,
+            currentRole: this.currentRole,
+            availablePermissions: permissions
+        });
         return false;
     }
 

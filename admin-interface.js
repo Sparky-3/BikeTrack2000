@@ -471,13 +471,6 @@ function renderDonorsTable(donors) {
 
 // Edit bike function
 async function editBike(bikeId) {
-    // Debug logging
-    console.log('🔍 Edit bike permission check:', {
-        currentRole: window.roleManager.currentRole,
-        hasPermission: window.roleManager.hasPermission('update', 'bikes'),
-        isAdmin: window.roleManager.currentRole === 'admin'
-    });
-    
     if (!window.roleManager.hasPermission('update', 'bikes')) {
         alert(`You do not have permission to edit bikes.\n\nYour role: ${window.roleManager.currentRole || 'None'}\n\nPlease run: await window.debugRoles.runDiagnostic() in the console to diagnose the issue.`);
         return;
@@ -488,11 +481,6 @@ async function editBike(bikeId) {
 
 // Delete bike function
 async function deleteBike(bikeId) {
-    console.log('🔍 Delete bike permission check:', {
-        currentRole: window.roleManager.currentRole,
-        hasPermission: window.roleManager.hasPermission('delete', 'bikes')
-    });
-    
     if (!window.roleManager.hasPermission('delete', 'bikes')) {
         alert(`You do not have permission to delete bikes.\n\nYour role: ${window.roleManager.currentRole || 'None'}`);
         return;
@@ -510,11 +498,6 @@ async function viewDonor(donorId) {
 
 // Edit donor function
 async function editDonor(donorId) {
-    console.log('🔍 Edit donor permission check:', {
-        currentRole: window.roleManager.currentRole,
-        hasPermission: window.roleManager.hasPermission('update', 'donors')
-    });
-    
     if (!window.roleManager.hasPermission('update', 'donors')) {
         alert(`You do not have permission to edit donors.\n\nYour role: ${window.roleManager.currentRole || 'None'}`);
         return;
