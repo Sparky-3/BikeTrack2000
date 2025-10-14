@@ -47,7 +47,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await login(email, password);
                 
                 if (data && data.user) {
-                    alert('Login successful!');
                     if (loginModal) loginModal.style.display = 'none';
                     
                     // Clear form
