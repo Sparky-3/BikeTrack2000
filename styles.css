@@ -1043,6 +1043,17 @@ body:has(.donation-form) .header {
     top: 65px;
     z-index: 50;
     font-family: 'Courier New', monospace;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+
+.filter-section-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 .admin-filters::before {
@@ -1130,7 +1141,7 @@ body:has(.donation-form) .header {
     border: 3px solid #1e3a8a;
     position: relative;
     font-family: 'Courier New', monospace;
-    max-height: calc(100vh - 450px);
+    max-height: calc(100vh - 300px);
     overflow-y: auto;
 }
 
@@ -1172,12 +1183,6 @@ body:has(.donation-form) .header {
     text-transform: uppercase;
     letter-spacing: 1px;
     text-shadow: 2px 2px 0px #fef3c7;
-}
-
-.table-header-actions {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
 }
 
 .bikes-table {
@@ -1511,6 +1516,12 @@ body:has(.donation-form) .header {
 
     .admin-filters {
         padding: 1rem;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-section-left {
+        width: 100%;
     }
 
     .filter-tabs {
