@@ -1147,6 +1147,7 @@ body:has(.donation-form) .header {
     border-collapse: collapse;
     font-size: 0.875rem;
     font-family: 'Courier New', monospace;
+    table-layout: fixed;
 }
 
 .bikes-table th,
@@ -1178,6 +1179,10 @@ body:has(.donation-form) .header {
     background: #fef3c7;
     color: #1e3a8a;
     font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
 }
 
 .status-badge {
