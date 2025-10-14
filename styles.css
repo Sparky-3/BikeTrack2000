@@ -679,7 +679,6 @@ body:has(.donation-form) .header {
 
 .bikes-table th:nth-child(6) {
     width: 8.33%;
-    text-align: right;
 }
 
 .bikes-table th:nth-child(7) {
@@ -718,9 +717,6 @@ body:has(.donation-form) .header {
     background: #fef3c7;
 }
 
-.bikes-table td:nth-child(6) {
-    text-align: right;
-}
 
 .work-order-btn {
     background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
