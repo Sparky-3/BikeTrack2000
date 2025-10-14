@@ -142,7 +142,7 @@ class RoleManager {
 
     // Check if user can access a specific bike program
     canAccessProgram(program) {
-        const role = this.currentRole;
+        const role = this.currentRole?.toLowerCase();
         
         switch (program) {
             case 'earn-a-bike':
@@ -158,16 +158,26 @@ class RoleManager {
 
     // Check if user can see donor form
     canSeeDonorForm() {
-        const role = this.currentRole;
+        const role = this.currentRole?.toLowerCase();
         return role === 'sales' || role === 'admin';
     }
 
     // Get user-friendly role name
     getRoleName() {
-        if (!this.currentRole || !USER_ROLES[this.currentRole]) {
+        if (!this.currentRole) {
             return 'Not Logged In';
         }
-        return USER_ROLES[this.currentRole].name;
+        
+        // Handle case-insensitive role lookup
+        const roleKey = Object.keys(USER_ROLES).find(key => 
+            key.toLowerCase() === this.currentRole.toLowerCase()
+        );
+        
+        if (!roleKey) {
+            return 'Not Logged In';
+        }
+        
+        return USER_ROLES[roleKey].name;
     }
 
     // Check if user is logged in

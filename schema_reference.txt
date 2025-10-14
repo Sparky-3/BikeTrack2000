@@ -1,12 +1,6 @@
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
-CREATE TABLE public.bike_sizes (
-  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
-  size text UNIQUE,
-  CONSTRAINT bike_sizes_pkey PRIMARY KEY (id)
-);
 CREATE TABLE public.bikes (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   serial_number bigint NOT NULL UNIQUE,
@@ -22,7 +16,6 @@ CREATE TABLE public.bikes (
   status USER-DEFINED NOT NULL DEFAULT 'In stock'::status,
   bottom_bracket_serial text UNIQUE,
   CONSTRAINT bikes_pkey PRIMARY KEY (id),
-  CONSTRAINT sales_bikes_size_fkey FOREIGN KEY (size) REFERENCES public.bike_sizes(size),
   CONSTRAINT sales_bikes_model_fkey FOREIGN KEY (model) REFERENCES public.models(name),
   CONSTRAINT sales_bikes_brand_fkey FOREIGN KEY (brand) REFERENCES public.brands(name),
   CONSTRAINT bikes_donated_to_fkey FOREIGN KEY (donated_to) REFERENCES public.recipients(name)

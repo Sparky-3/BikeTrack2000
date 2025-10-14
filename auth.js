@@ -82,8 +82,12 @@ async function updateAuthUI() {
         // Initialize user role
         await window.roleManager.initializeUserRole(user);
         
+        // Wait a moment to ensure role is set
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         // Update login button to show user info and logout
         const roleName = window.roleManager.getRoleName();
+        console.log('Setting button text with role:', roleName);
         loginBtn.textContent = `Logout (${roleName})`;
         loginBtn.onclick = logout;
         
@@ -104,8 +108,10 @@ async function updateAuthUI() {
 // Load interface based on user role
 async function loadRoleBasedInterface() {
     const role = window.roleManager.currentRole;
+    console.log('loadRoleBasedInterface called with role:', role);
     
     if (!role) {
+        console.log('No role found, loading public interface');
         await loadPublicInterface();
         return;
     }
@@ -115,10 +121,18 @@ async function loadRoleBasedInterface() {
     publicElements.forEach(el => el.style.display = 'none');
 
     // Show appropriate admin interface
-    if (role === 'sales') {
+    const roleLower = role?.toLowerCase();
+    console.log('Role lowercased:', roleLower);
+    
+    if (roleLower === 'sales') {
+        console.log('Loading sales interface');
         await loadSalesInterface();
-    } else if (['earn-a-bike', 'give-a-bike', 'admin'].includes(role)) {
+    } else if (['earn-a-bike', 'give-a-bike', 'admin'].includes(roleLower)) {
+        console.log('Loading admin interface');
         await loadAdminInterface();
+    } else {
+        console.log('Unknown role, loading public interface');
+        await loadPublicInterface();
     }
 }
 
