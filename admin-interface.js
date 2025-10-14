@@ -48,9 +48,6 @@ async function createAdminInterface() {
     adminInterface.innerHTML = `
         <div class="admin-header">
             <h1>Welcome, ${window.roleManager.currentUser?.email || 'User'}!</h1>
-            <div class="admin-actions">
-                ${window.roleManager.canSeeDonorForm() ? '<button id="donorFormBtn" class="btn btn-primary">Donor Form</button>' : ''}
-            </div>
         </div>
 
         <div class="dashboard-metrics">
@@ -86,7 +83,10 @@ async function createAdminInterface() {
         <div class="bikes-table-container">
             <div class="table-header">
                 <h3>Bikes Inventory</h3>
-                <button id="refreshBikes" class="btn btn-secondary">Refresh</button>
+                <div class="table-header-actions">
+                    ${window.roleManager.canSeeDonorForm() ? '<button id="donorFormBtn" class="btn btn-primary">Donor Form</button>' : ''}
+                    <button id="refreshBikes" class="btn btn-secondary">Refresh</button>
+                </div>
             </div>
             <div class="bikes-table" id="bikesTable">
                 <div class="loading">Loading bikes...</div>
@@ -114,9 +114,6 @@ async function createSalesInterface() {
     adminInterface.innerHTML = `
         <div class="admin-header">
             <h1>Welcome, ${window.roleManager.currentUser?.email || 'User'}!</h1>
-            <div class="admin-actions">
-                <button id="donorFormBtn" class="btn btn-primary">Donor Form</button>
-            </div>
         </div>
 
         <div class="dashboard-metrics">
@@ -152,7 +149,10 @@ async function createSalesInterface() {
         <div class="bikes-table-container">
             <div class="table-header">
                 <h3>Bikes Inventory</h3>
-                <button id="refreshBikes" class="btn btn-secondary">Refresh</button>
+                <div class="table-header-actions">
+                    <button id="donorFormBtn" class="btn btn-primary">Donor Form</button>
+                    <button id="refreshBikes" class="btn btn-secondary">Refresh</button>
+                </div>
             </div>
             <div class="bikes-table" id="bikesTable">
                 <div class="loading">Loading bikes...</div>

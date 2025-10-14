@@ -966,9 +966,7 @@ body:has(.donation-form) .header {
 }
 
 .admin-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    text-align: center;
     margin-bottom: 2rem;
     padding: 0 2rem;
 }
@@ -981,11 +979,6 @@ body:has(.donation-form) .header {
     text-transform: uppercase;
     letter-spacing: 1px;
     text-shadow: 2px 2px 0px #fef3c7;
-}
-
-.admin-actions {
-    display: flex;
-    gap: 1rem;
 }
 
 .dashboard-metrics {
@@ -1157,12 +1150,12 @@ body:has(.donation-form) .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0;
     position: sticky;
     top: 0;
     background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
     z-index: 11;
-    padding: 0.5rem 0;
+    padding-bottom: 1rem;
     margin-left: -1.5rem;
     margin-right: -1.5rem;
     padding-left: 1.5rem;
@@ -1181,6 +1174,12 @@ body:has(.donation-form) .header {
     text-shadow: 2px 2px 0px #fef3c7;
 }
 
+.table-header-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
 .bikes-table {
     width: 100%;
     border-collapse: collapse;
@@ -1191,7 +1190,7 @@ body:has(.donation-form) .header {
 
 .bikes-table thead {
     position: sticky;
-    top: 68px;
+    top: 64px;
     z-index: 10;
 }
 
