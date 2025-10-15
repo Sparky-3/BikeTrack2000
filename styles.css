@@ -657,53 +657,7 @@ body:has(.donation-form) .header {
     text-shadow: 1px 1px 0px #0f172a;
 }
 
-.bikes-table th:nth-child(1) {
-    width: 8.33%;
-}
-
-.bikes-table th:nth-child(2) {
-    width: 8.33%;
-}
-
-.bikes-table th:nth-child(3) {
-    width: 8.33%;
-}
-
-.bikes-table th:nth-child(4) {
-    width: 8.33%;
-}
-
-.bikes-table th:nth-child(5) {
-    width: 8.33%;
-}
-
-.bikes-table th:nth-child(6) {
-    width: 8.33%;
-}
-
-.bikes-table th:nth-child(7) {
-    width: 8.33%;
-}
-
-.bikes-table th:nth-child(8) {
-    width: 8.33%;
-}
-
-.bikes-table th:nth-child(9) {
-    width: 8.33%;
-}
-
-.bikes-table th:nth-child(10) {
-    width: 8.33%;
-}
-
-.bikes-table th:nth-child(11) {
-    width: 8.33%;
-}
-
-.bikes-table th:nth-child(12) {
-    width: 8.33%;
-}
+/* Column widths are now controlled by the optimized rules below */
 
 .bikes-table td {
     padding: 0.6rem 0.5rem;
@@ -1119,6 +1073,8 @@ body:has(.donation-form) .header {
     border: 3px solid #1e3a8a;
     position: relative;
     font-family: 'Courier New', monospace;
+    overflow-x: auto;
+    overflow-y: visible;
 }
 
 .bikes-table-container::before {
@@ -1158,6 +1114,7 @@ body:has(.donation-form) .header {
 
 .bikes-table {
     width: 100%;
+    min-width: 1200px; /* Ensure table has minimum width for all columns */
     border-collapse: collapse;
     font-size: 0.875rem;
     font-family: 'Courier New', monospace;
@@ -1234,6 +1191,67 @@ body:has(.donation-form) .header {
     overflow: visible;
     text-overflow: initial;
     min-width: 180px;
+}
+
+/* Optimize column widths for better fit */
+.bikes-table th:nth-child(1), .bikes-table td:nth-child(1) { /* Serial # */
+    width: 80px;
+    min-width: 80px;
+}
+
+.bikes-table th:nth-child(2), .bikes-table td:nth-child(2) { /* Brand */
+    width: 80px;
+    min-width: 80px;
+}
+
+.bikes-table th:nth-child(3), .bikes-table td:nth-child(3) { /* Model */
+    width: 100px;
+    min-width: 100px;
+}
+
+.bikes-table th:nth-child(4), .bikes-table td:nth-child(4) { /* Type */
+    width: 80px;
+    min-width: 80px;
+}
+
+.bikes-table th:nth-child(5), .bikes-table td:nth-child(5) { /* Size */
+    width: 60px;
+    min-width: 60px;
+}
+
+.bikes-table th:nth-child(6), .bikes-table td:nth-child(6) { /* Est. Value */
+    width: 80px;
+    min-width: 80px;
+}
+
+.bikes-table th:nth-child(7), .bikes-table td:nth-child(7) { /* Program */
+    width: 100px;
+    min-width: 100px;
+}
+
+.bikes-table th:nth-child(8), .bikes-table td:nth-child(8) { /* Condition */
+    width: 80px;
+    min-width: 80px;
+}
+
+.bikes-table th:nth-child(9), .bikes-table td:nth-child(9) { /* Status */
+    width: 100px;
+    min-width: 100px;
+}
+
+.bikes-table th:nth-child(10), .bikes-table td:nth-child(10) { /* Recipient */
+    width: 100px;
+    min-width: 100px;
+}
+
+.bikes-table th:nth-child(11), .bikes-table td:nth-child(11) { /* Notes */
+    width: 120px;
+    min-width: 120px;
+}
+
+.bikes-table th:nth-child(12), .bikes-table td:nth-child(12) { /* Bottom Bracket */
+    width: 120px;
+    min-width: 120px;
 }
 
 .status-badge {
