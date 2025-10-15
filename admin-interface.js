@@ -288,6 +288,9 @@ async function loadBikesTable() {
         }
 
         const bikes = await window.roleManager.getFilteredBikes(filters);
+        
+        console.log('Current user role:', window.roleManager.currentRole);
+        console.log('Loaded bikes for table:', bikes);
 
         // Render table
         renderBikesTable(bikes);
@@ -906,6 +909,14 @@ async function handleEditBikeSubmission(event) {
         donatedTo = document.getElementById('editDonatedTo').value.trim();
     }
     
+    // Determine the program based on status
+    let programValue = document.getElementById('editProgram').value;
+    if (!programValue && statusValue === 'Donated') {
+        // If no program is set but status is Donated, we might need to set a default
+        // or keep the existing program
+        console.log('No program set for donated bike');
+    }
+    
     // Collect form data
     const formData = {
         serial_number: document.getElementById('editSerialNumber').value,
@@ -938,6 +949,7 @@ async function handleEditBikeSubmission(event) {
         
         // If donated_to is provided, ensure the recipient exists in the database
         if (donatedTo) {
+            console.log('Processing recipient:', donatedTo);
             try {
                 // First, check if the recipient already exists
                 const { data: existingRecipient, error: checkError } = await window.supabaseClient
@@ -946,16 +958,24 @@ async function handleEditBikeSubmission(event) {
                     .eq('name', donatedTo)
                     .maybeSingle(); // Use maybeSingle() instead of single() to avoid error when not found
                 
+                console.log('Recipient check result:', { existingRecipient, checkError });
+                
                 // If recipient doesn't exist (no data and no error), create it
                 if (!existingRecipient && !checkError) {
-                    const { error: createError } = await window.supabaseClient
+                    console.log('Creating new recipient:', donatedTo);
+                    const { data: newRecipient, error: createError } = await window.supabaseClient
                         .from('recipients')
-                        .insert({ name: donatedTo });
+                        .insert({ name: donatedTo })
+                        .select();
                     
                     if (createError) {
                         console.error('Error creating recipient:', createError);
-                        throw createError; // Throw the error to prevent bike update with invalid recipient
+                        alert('Error creating recipient: ' + createError.message);
+                        return; // Stop the form submission
                     }
+                    console.log('Recipient created successfully:', newRecipient);
+                } else {
+                    console.log('Recipient already exists or error occurred');
                 }
             } catch (error) {
                 console.error('Error handling recipient:', error);
@@ -966,17 +986,41 @@ async function handleEditBikeSubmission(event) {
         
         // Update the bike in the database
         console.log('Updating bike with data:', formData);
-        const { error } = await window.supabaseClient
+        console.log('Bike ID:', bikeId);
+        
+        const { data: updateResult, error } = await window.supabaseClient
             .from('bikes')
             .update(formData)
-            .eq('id', bikeId);
+            .eq('id', bikeId)
+            .select(); // Add select() to see what was actually updated
             
         if (error) {
             console.error('Error updating bike:', error);
+            alert('Error updating bike: ' + error.message);
             throw error;
         }
         
-        console.log('Bike updated successfully');
+        console.log('Bike update result:', updateResult);
+        
+        // Check if any rows were actually updated
+        if (!updateResult || updateResult.length === 0) {
+            console.error('No rows were updated - this might indicate a permission or constraint issue');
+            alert('No rows were updated. This might be due to insufficient permissions or database constraints.');
+            return;
+        }
+        
+        // Verify the update by fetching the bike again
+        const { data: verifyBike, error: verifyError } = await window.supabaseClient
+            .from('bikes')
+            .select('*')
+            .eq('id', bikeId)
+            .single();
+            
+        if (verifyError) {
+            console.error('Error verifying bike update:', verifyError);
+        } else {
+            console.log('Verified bike after update:', verifyBike);
+        }
         
         // Close modal and refresh the table
         closeEditBikeModal();
