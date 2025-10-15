@@ -1190,7 +1190,8 @@ body:has(.donation-form) .header {
     white-space: normal;
     overflow: visible;
     text-overflow: initial;
-    min-width: 180px;
+    min-width: 120px;
+    width: 120px;
 }
 
 /* Optimize column widths for better fit */
@@ -1205,8 +1206,8 @@ body:has(.donation-form) .header {
 }
 
 .bikes-table th:nth-child(3), .bikes-table td:nth-child(3) { /* Model */
-    width: 100px;
-    min-width: 100px;
+    width: 120px;
+    min-width: 120px;
 }
 
 .bikes-table th:nth-child(4), .bikes-table td:nth-child(4) { /* Type */
@@ -1245,13 +1246,13 @@ body:has(.donation-form) .header {
 }
 
 .bikes-table th:nth-child(11), .bikes-table td:nth-child(11) { /* Notes */
-    width: 120px;
-    min-width: 120px;
+    width: 140px;
+    min-width: 140px;
 }
 
 .bikes-table th:nth-child(12), .bikes-table td:nth-child(12) { /* Bottom Bracket */
-    width: 120px;
-    min-width: 120px;
+    width: 140px;
+    min-width: 140px;
 }
 
 .status-badge {
