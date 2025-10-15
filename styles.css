@@ -1382,6 +1382,60 @@ body:has(.donation-form) .header {
     overflow-y: auto;
 }
 
+/* Edit Bike Modal Styles */
+#editBikeModal .modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+#editBikeModal .form-group {
+    margin-bottom: 1rem;
+}
+
+#editBikeModal .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #1e3a8a;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 0px #fef3c7;
+}
+
+#editBikeModal .form-group input,
+#editBikeModal .form-group select,
+#editBikeModal .form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #1e3a8a;
+    border-radius: 0;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #fef3c7;
+    color: #1e3a8a;
+    font-family: 'Courier New', monospace;
+    font-weight: 500;
+}
+
+#editBikeModal .form-group input:focus,
+#editBikeModal .form-group select:focus,
+#editBikeModal .form-group textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    background: #e6f3ff;
+}
+
+#editBikeModal .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 2px solid #1e3a8a;
+}
+
 .donation-section {
     margin-top: 1.5rem;
     padding: 1.5rem;

@@ -476,7 +476,23 @@ async function editBike(bikeId) {
         return;
     }
     
-    alert(`Edit bike ${bikeId} - functionality to be implemented!`);
+    try {
+        // Get the current bike data
+        const { data: bike, error: fetchError } = await window.supabaseClient
+            .from('bikes')
+            .select('*')
+            .eq('id', bikeId)
+            .single();
+            
+        if (fetchError) throw fetchError;
+        
+        // Show edit modal
+        showEditBikeModal(bike);
+        
+    } catch (error) {
+        console.error('Error fetching bike for edit:', error);
+        alert('Error loading bike data. Please try again.');
+    }
 }
 
 // Delete bike function
@@ -486,8 +502,35 @@ async function deleteBike(bikeId) {
         return;
     }
     
-    if (confirm('Are you sure you want to delete this bike?')) {
-        alert(`Delete bike ${bikeId} - functionality to be implemented!`);
+    try {
+        // Get bike details for confirmation
+        const { data: bike, error: fetchError } = await window.supabaseClient
+            .from('bikes')
+            .select('serial_number, brand, model')
+            .eq('id', bikeId)
+            .single();
+            
+        if (fetchError) throw fetchError;
+        
+        const confirmMessage = `Are you sure you want to delete this bike?\n\nSerial: ${bike.serial_number || 'N/A'}\nBrand: ${bike.brand || 'N/A'}\nModel: ${bike.model || 'N/A'}\n\nThis action cannot be undone.`;
+        
+        if (confirm(confirmMessage)) {
+            // Perform the deletion
+            const { error: deleteError } = await window.supabaseClient
+                .from('bikes')
+                .delete()
+                .eq('id', bikeId);
+                
+            if (deleteError) throw deleteError;
+            
+            // Show success message and refresh the table
+            alert('Bike deleted successfully!');
+            await loadBikesTable();
+        }
+        
+    } catch (error) {
+        console.error('Error deleting bike:', error);
+        alert('Error deleting bike. Please try again.');
     }
 }
 
@@ -506,6 +549,188 @@ async function editDonor(donorId) {
     alert(`Edit donor ${donorId} - functionality to be implemented!`);
 }
 
+// Show edit bike modal
+function showEditBikeModal(bike) {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('editBikeModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'editBikeModal';
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 600px;">
+                <span class="close" onclick="closeEditBikeModal()">&times;</span>
+                <h2>Edit Bike</h2>
+                <form id="editBikeForm">
+                    <div class="form-group">
+                        <label for="editSerialNumber">Serial Number *</label>
+                        <input type="number" id="editSerialNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editBrand">Brand</label>
+                        <input type="text" id="editBrand">
+                    </div>
+                    <div class="form-group">
+                        <label for="editModel">Model</label>
+                        <input type="text" id="editModel">
+                    </div>
+                    <div class="form-group">
+                        <label for="editType">Type</label>
+                        <select id="editType">
+                            <option value="">Select Type</option>
+                            <option value="Mountain">Mountain</option>
+                            <option value="Road">Road</option>
+                            <option value="Hybrid">Hybrid</option>
+                            <option value="BMX">BMX</option>
+                            <option value="Cruiser">Cruiser</option>
+                            <option value="Kids">Kids</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editSize">Size</label>
+                        <select id="editSize">
+                            <option value="">Select Size</option>
+                            <option value="XS">XS</option>
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                            <option value="XXL">XXL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editValue">Estimated Value ($)</label>
+                        <input type="number" id="editValue" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="editProgram">Program</label>
+                        <select id="editProgram">
+                            <option value="">Select Program</option>
+                            <option value="Earn-A-Bike">Earn-A-Bike</option>
+                            <option value="Give-A-Bike">Give-A-Bike</option>
+                            <option value="Sales">Sales</option>
+                            <option value="Strip">Strip</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editCondition">Condition</label>
+                        <select id="editCondition">
+                            <option value="">Select Condition</option>
+                            <option value="Excellent">Excellent</option>
+                            <option value="Good">Good</option>
+                            <option value="Fair">Fair</option>
+                            <option value="Poor">Poor</option>
+                            <option value="For Parts">For Parts</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editStatus">Status</label>
+                        <select id="editStatus">
+                            <option value="In stock">In stock</option>
+                            <option value="Earned">Earned</option>
+                            <option value="Donated">Donated</option>
+                            <option value="Trashed">Trashed</option>
+                            <option value="Strip">Strip</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editDonatedTo">Donated To</label>
+                        <input type="text" id="editDonatedTo">
+                    </div>
+                    <div class="form-group">
+                        <label for="editNotes">Notes</label>
+                        <textarea id="editNotes" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="editBottomBracketSerial">Bottom Bracket Serial</label>
+                        <input type="text" id="editBottomBracketSerial">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditBikeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update Bike</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // Add form submit handler
+        document.getElementById('editBikeForm').addEventListener('submit', handleEditBikeSubmission);
+    }
+    
+    // Populate form with current bike data
+    document.getElementById('editSerialNumber').value = bike.serial_number || '';
+    document.getElementById('editBrand').value = bike.brand || '';
+    document.getElementById('editModel').value = bike.model || '';
+    document.getElementById('editType').value = bike.type || '';
+    document.getElementById('editSize').value = bike.size || '';
+    document.getElementById('editValue').value = bike.value || '';
+    document.getElementById('editProgram').value = bike.program || '';
+    document.getElementById('editCondition').value = bike.condition || '';
+    document.getElementById('editStatus').value = bike.status || 'In stock';
+    document.getElementById('editDonatedTo').value = bike.donated_to || '';
+    document.getElementById('editNotes').value = bike.notes || '';
+    document.getElementById('editBottomBracketSerial').value = bike.bottom_bracket_serial || '';
+    
+    // Store the bike ID for the update
+    modal.dataset.bikeId = bike.id;
+    
+    // Show modal
+    modal.style.display = 'block';
+}
+
+// Close edit bike modal
+function closeEditBikeModal() {
+    const modal = document.getElementById('editBikeModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Handle edit bike form submission
+async function handleEditBikeSubmission(event) {
+    event.preventDefault();
+    
+    const modal = document.getElementById('editBikeModal');
+    const bikeId = modal.dataset.bikeId;
+    
+    // Collect form data
+    const formData = {
+        serial_number: document.getElementById('editSerialNumber').value,
+        brand: document.getElementById('editBrand').value,
+        model: document.getElementById('editModel').value,
+        type: document.getElementById('editType').value,
+        size: document.getElementById('editSize').value,
+        value: document.getElementById('editValue').value ? parseInt(document.getElementById('editValue').value) : null,
+        program: document.getElementById('editProgram').value,
+        condition: document.getElementById('editCondition').value,
+        status: document.getElementById('editStatus').value,
+        donated_to: document.getElementById('editDonatedTo').value,
+        notes: document.getElementById('editNotes').value,
+        bottom_bracket_serial: document.getElementById('editBottomBracketSerial').value
+    };
+    
+    try {
+        // Update the bike in the database
+        const { error } = await window.supabaseClient
+            .from('bikes')
+            .update(formData)
+            .eq('id', bikeId);
+            
+        if (error) throw error;
+        
+        // Show success message and refresh the table
+        alert('Bike updated successfully!');
+        closeEditBikeModal();
+        await loadBikesTable();
+        
+    } catch (error) {
+        console.error('Error updating bike:', error);
+        alert('Error updating bike. Please try again.');
+    }
+}
+
 // Export functions for global access
 window.loadAdminInterface = loadAdminInterface;
 window.loadSalesInterface = loadSalesInterface;
@@ -516,3 +741,6 @@ window.editBike = editBike;
 window.deleteBike = deleteBike;
 window.viewDonor = viewDonor;
 window.editDonor = editDonor;
+window.showEditBikeModal = showEditBikeModal;
+window.closeEditBikeModal = closeEditBikeModal;
+window.handleEditBikeSubmission = handleEditBikeSubmission;
