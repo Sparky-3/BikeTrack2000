@@ -900,12 +900,14 @@ async function handleEditBikeSubmission(event) {
         model = document.getElementById('editModelNew').value;
     }
     
-    // Get donated_to value (only if status is "donated")
+    // Get donated_to value based on status
     const statusValue = document.getElementById('editStatus').value;
     let donatedTo = '';
     if (statusValue === 'donated') {
         donatedTo = document.getElementById('editDonatedTo').value.trim();
     }
+    // Note: When status is not 'donated', donatedTo remains empty string
+    // which will be handled in the formData logic below
     
     // Determine the program based on status
     let programValue = document.getElementById('editProgram').value;
@@ -933,9 +935,12 @@ async function handleEditBikeSubmission(event) {
         bottom_bracket_serial: document.getElementById('editBottomBracketSerial').value
     };
     
-    // Only include donated_to if it has a value (status is "donated")
-    if (donatedTo && donatedTo.trim()) {
+    // Handle donated_to based on status
+    if (statusValue === 'donated' && donatedTo && donatedTo.trim()) {
         formData.donated_to = donatedTo;
+    } else if (statusValue !== 'donated') {
+        // Explicitly set to null when status is not 'donated'
+        formData.donated_to = null;
     }
     
     try {
