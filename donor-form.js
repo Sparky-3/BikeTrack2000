@@ -76,18 +76,23 @@ function createDonorFormModal() {
                         <label for="bikeType">Type</label>
                         <select id="bikeType">
                             <option value="">Select bike type</option>
-                            <option value="road">Road Bike</option>
+                            <option value="youth">Youth</option>
                             <option value="mountain">Mountain Bike</option>
+                            <option value="road">Road Bike</option>
                             <option value="hybrid">Hybrid</option>
-                            <option value="cruiser">Cruiser</option>
-                            <option value="bmx">BMX</option>
-                            <option value="other">Other</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label for="bikeSize">Size</label>
-                        <input type="text" id="bikeSize">
+                        <select id="bikeSize">
+                            <option value="">Select size</option>
+                            <option value="xsmall">XSmall</option>
+                            <option value="small">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="large">Large</option>
+                            <option value="xlarge">XLarge</option>
+                        </select>
                     </div>
                     
                     <div class="form-group">
@@ -98,7 +103,6 @@ function createDonorFormModal() {
                             <option value="good">Good</option>
                             <option value="fair">Fair</option>
                             <option value="poor">Poor</option>
-                            <option value="needs_repair">Needs Repair</option>
                         </select>
                     </div>
                     

@@ -269,20 +269,20 @@ async function loadBikesTable() {
             const filterType = activeTab.dataset.filter;
             switch (filterType) {
                 case 'on-hand':
-                    filters.status = 'In stock';
+                    filters.status = 'in-stock';
                     break;
                 case 'trashed':
-                    filters.status = 'Trashed';
+                    filters.status = 'trashed';
                     break;
                 case 'out':
                     // Show all bikes that are not in stock, trashed, or strip
-                    filters.statusNotIn = ['In stock', 'Trashed', 'Strip'];
+                    filters.statusNotIn = ['in-stock', 'trashed', 'strip'];
                     break;
                 case 'earned':
-                    filters.status = 'Earned';
+                    filters.status = 'earned';
                     break;
                 case 'strip':
-                    filters.status = 'Strip';
+                    filters.status = 'strip';
                     break;
             }
         }
@@ -591,9 +591,10 @@ async function showEditBikeModal(bike) {
                         <label for="editType">Type</label>
                         <select id="editType">
                             <option value="">Select Type</option>
-                            <option value="Mountain">Mountain</option>
-                            <option value="Road">Road</option>
-                            <option value="Hybrid">Hybrid</option>
+                            <option value="youth">Youth</option>
+                            <option value="mountain">Mountain</option>
+                            <option value="road">Road</option>
+                            <option value="hybrid">Hybrid</option>
                             <option value="BMX">BMX</option>
                             <option value="Cruiser">Cruiser</option>
                             <option value="Kids">Kids</option>
@@ -604,12 +605,11 @@ async function showEditBikeModal(bike) {
                         <label for="editSize">Size</label>
                         <select id="editSize">
                             <option value="">Select Size</option>
-                            <option value="XS">XS</option>
-                            <option value="S">S</option>
-                            <option value="M">M</option>
-                            <option value="L">L</option>
-                            <option value="XL">XL</option>
-                            <option value="XXL">XXL</option>
+                            <option value="xsmall">XSmall</option>
+                            <option value="small">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="large">Large</option>
+                            <option value="xlarge">XLarge</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -630,21 +630,22 @@ async function showEditBikeModal(bike) {
                         <label for="editCondition">Condition</label>
                         <select id="editCondition">
                             <option value="">Select Condition</option>
-                            <option value="Excellent">Excellent</option>
-                            <option value="Good">Good</option>
-                            <option value="Fair">Fair</option>
-                            <option value="Poor">Poor</option>
+                            <option value="excellent">Excellent</option>
+                            <option value="good">Good</option>
+                            <option value="fair">Fair</option>
+                            <option value="poor">Poor</option>
                             <option value="For Parts">For Parts</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="editStatus">Status</label>
                         <select id="editStatus">
-                            <option value="In stock">In stock</option>
-                            <option value="Earned">Earned</option>
-                            <option value="Donated">Donated</option>
-                            <option value="Trashed">Trashed</option>
-                            <option value="Strip">Strip</option>
+                            <option value="in-stock">In stock</option>
+                            <option value="earned">Earned</option>
+                            <option value="donated">Donated</option>
+                            <option value="for sale">For sale</option>
+                            <option value="trashed">Trashed</option>
+                            <option value="strip">Strip</option>
                         </select>
                     </div>
                     <div class="form-group" id="editDonatedToGroup" style="display: none;">
@@ -731,13 +732,13 @@ async function showEditBikeModal(bike) {
     document.getElementById('editValue').value = bike.value || '';
     document.getElementById('editProgram').value = bike.program || '';
     document.getElementById('editCondition').value = bike.condition || '';
-    document.getElementById('editStatus').value = bike.status || 'In stock';
+    document.getElementById('editStatus').value = bike.status || 'in-stock';
     
     // Handle donated_to field visibility and value
     const donatedToGroup = document.getElementById('editDonatedToGroup');
     const donatedToInput = document.getElementById('editDonatedTo');
     
-    if (bike.status === 'Donated') {
+    if (bike.status === 'donated') {
         donatedToGroup.style.display = 'block';
         donatedToInput.value = bike.donated_to || '';
     } else {
@@ -873,7 +874,7 @@ function setupEditBikeStatusListener() {
     
     if (statusSelect && donatedToGroup && donatedToInput) {
         statusSelect.addEventListener('change', function() {
-            if (this.value === 'Donated') {
+            if (this.value === 'donated') {
                 donatedToGroup.style.display = 'block';
             } else {
                 donatedToGroup.style.display = 'none';
@@ -905,7 +906,7 @@ async function handleEditBikeSubmission(event) {
     // Get donated_to value (only if status is "Donated")
     const statusValue = document.getElementById('editStatus').value;
     let donatedTo = '';
-    if (statusValue === 'Donated') {
+    if (statusValue === 'donated') {
         donatedTo = document.getElementById('editDonatedTo').value.trim();
     }
     
@@ -913,7 +914,7 @@ async function handleEditBikeSubmission(event) {
     let programValue = document.getElementById('editProgram').value;
     
     // For donated bikes, we need to ensure there's a program value for RLS policy
-    if (statusValue === 'Donated' && !programValue) {
+    if (statusValue === 'donated' && !programValue) {
         // If no program is set for a donated bike, we need to set a default program
         // to satisfy the RLS policy requirement of can_access_program((program)::text)
         programValue = 'give-a-bike'; // Default program for donated bikes

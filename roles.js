@@ -280,21 +280,21 @@ class RoleManager {
 
         bikes.forEach(bike => {
             switch (bike.status) {
-                case 'In stock':
+                case 'in-stock':
                     counts.onHand++;
                     break;
-                case 'Donated':
-                case 'For sale':
-                case 'Earned':
+                case 'donated':
+                case 'for sale':
+                case 'earned':
                     counts.out++;
-                    if (bike.status === 'Earned') {
+                    if (bike.status === 'earned') {
                         counts.earned++;
                     }
                     break;
-                case 'Trashed':
+                case 'trashed':
                     counts.trashed++;
                     break;
-                case 'Strip':
+                case 'strip':
                     counts.strip++;
                     break;
             }
