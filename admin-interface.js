@@ -911,10 +911,13 @@ async function handleEditBikeSubmission(event) {
     
     // Determine the program based on status
     let programValue = document.getElementById('editProgram').value;
-    if (!programValue && statusValue === 'Donated') {
-        // If no program is set but status is Donated, we might need to set a default
-        // or keep the existing program
-        console.log('No program set for donated bike');
+    
+    // For donated bikes, we need to ensure there's a program value for RLS policy
+    if (statusValue === 'Donated' && !programValue) {
+        // If no program is set for a donated bike, we need to set a default program
+        // to satisfy the RLS policy requirement of can_access_program((program)::text)
+        programValue = 'Give-A-Bike'; // Default program for donated bikes
+        console.log('Setting default program for donated bike:', programValue);
     }
     
     // Collect form data
@@ -925,7 +928,7 @@ async function handleEditBikeSubmission(event) {
         type: document.getElementById('editType').value,
         size: document.getElementById('editSize').value,
         value: document.getElementById('editValue').value ? parseInt(document.getElementById('editValue').value) : null,
-        program: document.getElementById('editProgram').value,
+        program: programValue, // Use the processed program value
         condition: document.getElementById('editCondition').value,
         status: document.getElementById('editStatus').value,
         donated_to: donatedTo,
