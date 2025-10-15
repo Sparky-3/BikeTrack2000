@@ -980,8 +980,7 @@ async function handleEditBikeSubmission(event) {
             
         if (error) throw error;
         
-        // Show success message and refresh the table
-        alert('Bike updated successfully!');
+        // Close modal and refresh the table
         closeEditBikeModal();
         await loadBikesTable();
         
