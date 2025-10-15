@@ -1179,6 +1179,7 @@ body:has(.donation-form) .header {
 
 .bikes-table tbody tr:hover {
     background: #cce7ff;
+    cursor: pointer;
 }
 
 .bikes-table tbody tr:hover td {

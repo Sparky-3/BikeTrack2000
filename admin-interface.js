@@ -333,7 +333,7 @@ function renderBikesTable(bikes) {
         </thead>
         <tbody>
             ${bikes.map(bike => `
-                <tr>
+                <tr onclick="showBikeDetails('${bike.id}')" style="cursor: pointer;">
                     <td>${bike.serial_number || 'N/A'}</td>
                     <td>${bike.brand || 'N/A'}</td>
                     <td>${bike.model || 'N/A'}</td>
@@ -347,8 +347,8 @@ function renderBikesTable(bikes) {
                     <td>${bike.notes || 'N/A'}</td>
                     <td>${bike.bottom_bracket_serial || 'N/A'}</td>
                     <td>
-                        <button class="btn btn-sm btn-primary" onclick="editBike('${bike.id}')">Edit</button>
-                        ${window.roleManager.hasPermission('delete') ? `<button class="btn btn-sm btn-danger" onclick="deleteBike('${bike.id}')">Delete</button>` : ''}
+                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); editBike('${bike.id}')">Edit</button>
+                        ${window.roleManager.hasPermission('delete') ? `<button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteBike('${bike.id}')">Delete</button>` : ''}
                     </td>
                 </tr>
             `).join('')}
@@ -1035,8 +1035,181 @@ async function handleEditBikeSubmission(event) {
 }
 
 // Export functions for global access
+// Show bike details in a read-only popup
+async function showBikeDetails(bikeId) {
+    try {
+        // Fetch the bike details
+        const { data: bike, error } = await window.supabaseClient
+            .from('bikes')
+            .select('*')
+            .eq('id', bikeId)
+            .single();
+            
+        if (error) {
+            console.error('Error fetching bike details:', error);
+            alert('Error loading bike details: ' + error.message);
+            return;
+        }
+        
+        // Create and show the details modal
+        createBikeDetailsModal(bike);
+        
+    } catch (error) {
+        console.error('Error in showBikeDetails:', error);
+        alert('Error loading bike details');
+    }
+}
+
+// Create the bike details modal
+function createBikeDetailsModal(bike) {
+    // Remove existing modal if it exists
+    const existingModal = document.getElementById('bikeDetailsModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Create modal HTML
+    const modal = document.createElement('div');
+    modal.id = 'bikeDetailsModal';
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.zIndex = '1000';
+    
+    modal.innerHTML = `
+        <div class="modal-content" style="
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            margin: 5vh auto;
+            padding: 2rem;
+            border: 3px solid #1e3a8a;
+            border-radius: 0;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 8px 8px 0px #1e3a8a;
+        ">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="color: #1e3a8a; margin: 0; font-family: 'Courier New', monospace;">Bike Details</h2>
+                <button onclick="closeBikeDetailsModal()" style="
+                    background: #dc2626;
+                    color: white;
+                    border: none;
+                    padding: 0.5rem 1rem;
+                    cursor: pointer;
+                    font-weight: bold;
+                    border-radius: 0;
+                ">✕ Close</button>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                <div>
+                    <strong style="color: #1e3a8a;">Serial Number:</strong><br>
+                    <span style="color: #1e3a8a;">${bike.serial_number || 'N/A'}</span>
+                </div>
+                <div>
+                    <strong style="color: #1e3a8a;">Program:</strong><br>
+                    <span style="color: #1e3a8a;">${bike.program || 'N/A'}</span>
+                </div>
+                <div>
+                    <strong style="color: #1e3a8a;">Brand:</strong><br>
+                    <span style="color: #1e3a8a;">${bike.brand || 'N/A'}</span>
+                </div>
+                <div>
+                    <strong style="color: #1e3a8a;">Model:</strong><br>
+                    <span style="color: #1e3a8a;">${bike.model || 'N/A'}</span>
+                </div>
+                <div>
+                    <strong style="color: #1e3a8a;">Type:</strong><br>
+                    <span style="color: #1e3a8a;">${bike.type || 'N/A'}</span>
+                </div>
+                <div>
+                    <strong style="color: #1e3a8a;">Size:</strong><br>
+                    <span style="color: #1e3a8a;">${bike.size || 'N/A'}</span>
+                </div>
+                <div>
+                    <strong style="color: #1e3a8a;">Condition:</strong><br>
+                    <span style="color: #1e3a8a;">${bike.condition || 'N/A'}</span>
+                </div>
+                <div>
+                    <strong style="color: #1e3a8a;">Status:</strong><br>
+                    <span class="status-badge status-${bike.status?.toLowerCase().replace(' ', '-')}">${bike.status || 'N/A'}</span>
+                </div>
+                <div>
+                    <strong style="color: #1e3a8a;">Estimated Value:</strong><br>
+                    <span style="color: #1e3a8a;">$${bike.value || 0}</span>
+                </div>
+                <div>
+                    <strong style="color: #1e3a8a;">Donated To:</strong><br>
+                    <span style="color: #1e3a8a;">${bike.donated_to || 'N/A'}</span>
+                </div>
+                <div>
+                    <strong style="color: #1e3a8a;">Bottom Bracket Serial:</strong><br>
+                    <span style="color: #1e3a8a;">${bike.bottom_bracket_serial || 'N/A'}</span>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <strong style="color: #1e3a8a;">Notes:</strong><br>
+                <div style="
+                    background: white;
+                    border: 2px solid #1e3a8a;
+                    padding: 1rem;
+                    margin-top: 0.5rem;
+                    min-height: 80px;
+                    color: #1e3a8a;
+                    font-family: 'Courier New', monospace;
+                    white-space: pre-wrap;
+                ">${bike.notes || 'No notes available'}</div>
+            </div>
+            
+            <div style="text-align: center;">
+                <button onclick="editBike('${bike.id}'); closeBikeDetailsModal();" style="
+                    background: #2563eb;
+                    color: white;
+                    border: none;
+                    padding: 0.75rem 1.5rem;
+                    margin-right: 1rem;
+                    cursor: pointer;
+                    font-weight: bold;
+                    border-radius: 0;
+                ">Edit Bike</button>
+                ${window.roleManager.hasPermission('delete') ? `
+                <button onclick="deleteBike('${bike.id}'); closeBikeDetailsModal();" style="
+                    background: #dc2626;
+                    color: white;
+                    border: none;
+                    padding: 0.75rem 1.5rem;
+                    cursor: pointer;
+                    font-weight: bold;
+                    border-radius: 0;
+                ">Delete Bike</button>
+                ` : ''}
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+// Close the bike details modal
+function closeBikeDetailsModal() {
+    const modal = document.getElementById('bikeDetailsModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
 window.loadAdminInterface = loadAdminInterface;
 window.loadSalesInterface = loadSalesInterface;
+window.showBikeDetails = showBikeDetails;
+window.closeBikeDetailsModal = closeBikeDetailsModal;
 window.loadBikesTable = loadBikesTable;
 window.performBikeSearch = performBikeSearch;
 window.loadDonorsTable = loadDonorsTable;
