@@ -327,6 +327,7 @@ function renderBikesTable(bikes) {
                 <th>Status</th>
                 <th>Recipient</th>
                 <th>Notes</th>
+                <th>Bottom Bracket</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -344,6 +345,7 @@ function renderBikesTable(bikes) {
                     <td><span class="status-badge status-${bike.status?.toLowerCase().replace(' ', '-')}">${bike.status || 'N/A'}</span></td>
                     <td>${bike.donated_to || 'N/A'}</td>
                     <td>${bike.notes || 'N/A'}</td>
+                    <td>${bike.bottom_bracket_serial || 'N/A'}</td>
                     <td>
                         <button class="btn btn-sm btn-primary" onclick="editBike('${bike.id}')">Edit</button>
                         ${window.roleManager.hasPermission('delete') ? `<button class="btn btn-sm btn-danger" onclick="deleteBike('${bike.id}')">Delete</button>` : ''}
