@@ -646,7 +646,12 @@ async function showEditBikeModal(bike) {
                     </div>
                     <div class="form-group">
                         <label for="editDonatedTo">Donated To</label>
-                        <input type="text" id="editDonatedTo">
+                        <select id="editDonatedTo">
+                            <option value="">Select recipient...</option>
+                            <option value="__ADD_NEW__">+ Add New Recipient</option>
+                        </select>
+                        <input type="text" id="editDonatedToNew" placeholder="Enter new recipient name" 
+                               style="display: none; margin-top: 0.5rem;" class="form-control">
                     </div>
                     <div class="form-group">
                         <label for="editNotes">Notes</label>
@@ -726,7 +731,28 @@ async function showEditBikeModal(bike) {
     document.getElementById('editProgram').value = bike.program || '';
     document.getElementById('editCondition').value = bike.condition || '';
     document.getElementById('editStatus').value = bike.status || 'In stock';
-    document.getElementById('editDonatedTo').value = bike.donated_to || '';
+    
+    // Handle donated_to selection
+    const donatedToSelect = document.getElementById('editDonatedTo');
+    if (bike.donated_to && donatedToSelect.options.length > 2) {
+        // Check if the bike's recipient exists in the dropdown
+        let recipientExists = false;
+        for (let option of donatedToSelect.options) {
+            if (option.value === bike.donated_to) {
+                donatedToSelect.value = bike.donated_to;
+                recipientExists = true;
+                break;
+            }
+        }
+        // If recipient doesn't exist in dropdown, show it in the new input field
+        if (!recipientExists && bike.donated_to) {
+            donatedToSelect.value = '__ADD_NEW__';
+            const donatedToNewInput = document.getElementById('editDonatedToNew');
+            donatedToNewInput.style.display = 'block';
+            donatedToNewInput.value = bike.donated_to;
+        }
+    }
+    
     document.getElementById('editNotes').value = bike.notes || '';
     document.getElementById('editBottomBracketSerial').value = bike.bottom_bracket_serial || '';
     
@@ -745,7 +771,7 @@ function closeEditBikeModal() {
     }
 }
 
-// Load brands and models for edit modal
+// Load brands, models, and recipients for edit modal
 async function loadBrandsAndModelsForEdit() {
     if (!window.supabaseClient) {
         console.error('Supabase client not initialized');
@@ -768,6 +794,14 @@ async function loadBrandsAndModelsForEdit() {
             .order('name', { ascending: true });
         
         if (modelsError) throw modelsError;
+        
+        // Fetch recipients
+        const { data: recipients, error: recipientsError } = await window.supabaseClient
+            .from('recipients')
+            .select('name')
+            .order('name', { ascending: true });
+        
+        if (recipientsError) throw recipientsError;
         
         // Populate brand dropdown
         const brandSelect = document.getElementById('editBrand');
@@ -803,17 +837,36 @@ async function loadBrandsAndModelsForEdit() {
             });
         }
         
+        // Populate recipients dropdown
+        const recipientsSelect = document.getElementById('editDonatedTo');
+        if (recipientsSelect && recipients) {
+            // Clear existing options except the first two
+            while (recipientsSelect.options.length > 2) {
+                recipientsSelect.removeChild(recipientsSelect.lastChild);
+            }
+            
+            // Add recipient options
+            recipients.forEach(recipient => {
+                const option = document.createElement('option');
+                option.value = recipient.name;
+                option.textContent = recipient.name;
+                recipientsSelect.appendChild(option);
+            });
+        }
+        
     } catch (error) {
-        console.error('Error loading brands and models:', error);
+        console.error('Error loading brands, models, and recipients:', error);
     }
 }
 
-// Setup brand/model listeners for edit modal
+// Setup brand/model/recipient listeners for edit modal
 function setupEditBikeBrandModelListeners() {
     const brandSelect = document.getElementById('editBrand');
     const brandNewInput = document.getElementById('editBrandNew');
     const modelSelect = document.getElementById('editModel');
     const modelNewInput = document.getElementById('editModelNew');
+    const recipientsSelect = document.getElementById('editDonatedTo');
+    const recipientsNewInput = document.getElementById('editDonatedToNew');
     
     if (brandSelect && brandNewInput) {
         brandSelect.addEventListener('change', function() {
@@ -842,6 +895,20 @@ function setupEditBikeBrandModelListeners() {
             }
         });
     }
+    
+    if (recipientsSelect && recipientsNewInput) {
+        recipientsSelect.addEventListener('change', function() {
+            if (this.value === '__ADD_NEW__') {
+                recipientsNewInput.style.display = 'block';
+                recipientsNewInput.required = true;
+                this.required = false;
+            } else {
+                recipientsNewInput.style.display = 'none';
+                recipientsNewInput.required = false;
+                this.required = true;
+            }
+        });
+    }
 }
 
 // Handle edit bike form submission
@@ -863,6 +930,12 @@ async function handleEditBikeSubmission(event) {
         model = document.getElementById('editModelNew').value;
     }
     
+    // Get donated_to (either from dropdown or new input)
+    let donatedTo = document.getElementById('editDonatedTo').value;
+    if (donatedTo === '__ADD_NEW__') {
+        donatedTo = document.getElementById('editDonatedToNew').value;
+    }
+    
     // Collect form data
     const formData = {
         serial_number: document.getElementById('editSerialNumber').value,
@@ -874,7 +947,7 @@ async function handleEditBikeSubmission(event) {
         program: document.getElementById('editProgram').value,
         condition: document.getElementById('editCondition').value,
         status: document.getElementById('editStatus').value,
-        donated_to: document.getElementById('editDonatedTo').value,
+        donated_to: donatedTo,
         notes: document.getElementById('editNotes').value,
         bottom_bracket_serial: document.getElementById('editBottomBracketSerial').value
     };
@@ -891,6 +964,12 @@ async function handleEditBikeSubmission(event) {
             await window.supabaseClient
                 .from('models')
                 .upsert({ name: model }, { onConflict: 'name', ignoreDuplicates: true });
+        }
+        
+        if (donatedTo && document.getElementById('editDonatedTo').value === '__ADD_NEW__') {
+            await window.supabaseClient
+                .from('recipients')
+                .upsert({ name: donatedTo }, { onConflict: 'name', ignoreDuplicates: true });
         }
         
         // Update the bike in the database
