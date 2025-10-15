@@ -620,9 +620,9 @@ async function showEditBikeModal(bike) {
                         <label for="editProgram">Program</label>
                         <select id="editProgram">
                             <option value="">Select Program</option>
-                            <option value="Earn-A-Bike">Earn-A-Bike</option>
-                            <option value="Give-A-Bike">Give-A-Bike</option>
-                            <option value="Sales">Sales</option>
+                            <option value="earn-a-bike">Earn-A-Bike</option>
+                            <option value="give-a-bike">Give-A-Bike</option>
+                            <option value="sales">Sales</option>
                             <option value="Strip">Strip</option>
                         </select>
                     </div>
@@ -916,7 +916,7 @@ async function handleEditBikeSubmission(event) {
     if (statusValue === 'Donated' && !programValue) {
         // If no program is set for a donated bike, we need to set a default program
         // to satisfy the RLS policy requirement of can_access_program((program)::text)
-        programValue = 'Give-A-Bike'; // Default program for donated bikes
+        programValue = 'give-a-bike'; // Default program for donated bikes
         console.log('Setting default program for donated bike:', programValue);
     }
     
@@ -988,99 +988,11 @@ async function handleEditBikeSubmission(event) {
         }
         
         // Update the bike in the database
-        console.log('Updating bike with data:', formData);
-        console.log('Bike ID:', bikeId);
-        console.log('Current user role:', window.roleManager.currentRole);
-        console.log('Current user:', window.roleManager.currentUser);
-        
-        // Check what role is actually stored in the database for this user
-        if (window.roleManager.currentUser?.id) {
-            const { data: userRoleData, error: roleError } = await window.supabaseClient
-                .from('user_roles')
-                .select('role')
-                .eq('user_id', window.roleManager.currentUser.id)
-                .single();
-            
-            if (roleError) {
-                console.error('Error fetching user role from database:', roleError);
-            } else {
-                console.log('User role in database:', userRoleData);
-            }
-        }
-        
-        // Test if we can read the bike record to verify read permissions
-        const { data: testRead, error: readError } = await window.supabaseClient
+        const { data: updateResult, error } = await window.supabaseClient
             .from('bikes')
-            .select('*')
+            .update(formData)
             .eq('id', bikeId)
-            .single();
-            
-        if (readError) {
-            console.error('Error reading bike record:', readError);
-        } else {
-            console.log('Successfully read bike record:', testRead);
-            console.log('Current bike program:', testRead.program);
-            console.log('Current bike status:', testRead.status);
-        }
-        
-        // Try updating with just the essential fields first to test RLS
-        const testFormData = {
-            status: formData.status,
-            donated_to: formData.donated_to,
-            program: formData.program
-        };
-        
-        console.log('Testing with minimal data:', testFormData);
-        
-        // If the current bike doesn't have a program, we need to set one
-        // Let's check what program the bike currently has
-        if (!testRead.program && statusValue === 'Donated') {
-            testFormData.program = 'give-a-bike';
-            console.log('Setting program to give-a-bike for donated bike');
-        } else if (!testRead.program) {
-            // For non-donated bikes, let's try to preserve the existing program or set a default
-            testFormData.program = testRead.program || 'give-a-bike';
-            console.log('Using existing program or default:', testFormData.program);
-        }
-        
-        // First, try a simple update with just status to test basic RLS
-        const simpleUpdateData = {
-            status: formData.status
-        };
-        
-        console.log('Testing simple status update:', simpleUpdateData);
-        
-        const { data: simpleResult, error: simpleError } = await window.supabaseClient
-            .from('bikes')
-            .update(simpleUpdateData)
-            .eq('id', bikeId)
-            .select();
-            
-        let updateResult, error;
-            
-        if (simpleError) {
-            console.error('Simple update failed:', simpleError);
-            error = simpleError;
-        } else if (simpleResult && simpleResult.length > 0) {
-            console.log('Simple update succeeded:', simpleResult);
-            // If simple update works, try the full update
-            const fullUpdateResult = await window.supabaseClient
-                .from('bikes')
-                .update(testFormData)
-                .eq('id', bikeId)
-                .select();
-            updateResult = fullUpdateResult.data;
-            error = fullUpdateResult.error;
-        } else {
-            console.log('Simple update returned no rows:', simpleResult);
-            const fullUpdateResult = await window.supabaseClient
-                .from('bikes')
-                .update(testFormData)
-                .eq('id', bikeId)
-                .select();
-            updateResult = fullUpdateResult.data;
-            error = fullUpdateResult.error;
-        }
+            .select(); // Add select() to see what was actually updated
             
         if (error) {
             console.error('Error updating bike:', error);

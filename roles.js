@@ -3,28 +3,28 @@
 // Define user roles and their permissions
 const USER_ROLES = {
     'earn-a-bike': {
-        name: 'Earn-A-Bike',
+        name: 'earn-a-bike',
         permissions: {
             canCRUD: ['earn-a-bike_bikes', 'strip_bikes'],
             canRead: ['all_tables']
         }
     },
     'give-a-bike': {
-        name: 'Give-A-Bike',
+        name: 'give-a-bike',
         permissions: {
             canCRUD: ['give-a-bike_bikes', 'strip_bikes'],
             canRead: ['all_tables']
         }
     },
     'sales': {
-        name: 'Sales',
+        name: 'sales',
         permissions: {
             canCRUD: ['sales_bikes', 'strip_bikes'],
             canRead: ['all_tables']
         }
     },
     'admin': {
-        name: 'Admin',
+        name: 'admin',
         permissions: {
             canCRUD: ['all_tables'],
             canRead: ['all_tables']
