@@ -570,8 +570,8 @@ async function showEditBikeModal(bike) {
                         <input type="number" id="editSerialNumber" required>
                     </div>
                     <div class="form-group">
-                        <label for="editBrand">Brand</label>
-                        <select id="editBrand">
+                        <label for="editBrand">Brand *</label>
+                        <select id="editBrand" required>
                             <option value="">Select brand...</option>
                             <option value="__ADD_NEW__">+ Add New Brand</option>
                         </select>
@@ -579,8 +579,8 @@ async function showEditBikeModal(bike) {
                                style="display: none; margin-top: 0.5rem;" class="form-control">
                     </div>
                     <div class="form-group">
-                        <label for="editModel">Model</label>
-                        <select id="editModel">
+                        <label for="editModel">Model *</label>
+                        <select id="editModel" required>
                             <option value="">Select model...</option>
                             <option value="__ADD_NEW__">+ Add New Model</option>
                         </select>
@@ -589,22 +589,18 @@ async function showEditBikeModal(bike) {
                     </div>
                     <div class="form-group">
                         <label for="editType">Type</label>
-                        <select id="editType">
-                            <option value="">Select Type</option>
+                        <select id="editType" required>
+                            <option value="">Select Type *</option>
                             <option value="youth">Youth</option>
                             <option value="mountain">Mountain</option>
                             <option value="road">Road</option>
                             <option value="hybrid">Hybrid</option>
-                            <option value="BMX">BMX</option>
-                            <option value="Cruiser">Cruiser</option>
-                            <option value="Kids">Kids</option>
-                            <option value="Other">Other</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="editSize">Size</label>
-                        <select id="editSize">
-                            <option value="">Select Size</option>
+                        <select id="editSize" required>
+                            <option value="">Select Size *</option>
                             <option value="xsmall">XSmall</option>
                             <option value="small">Small</option>
                             <option value="medium">Medium</option>
@@ -614,22 +610,22 @@ async function showEditBikeModal(bike) {
                     </div>
                     <div class="form-group">
                         <label for="editValue">Estimated Value ($)</label>
-                        <input type="number" id="editValue" min="0">
+                        <input type="number" id="editValue" min="0" required>
                     </div>
                     <div class="form-group">
                         <label for="editProgram">Program</label>
-                        <select id="editProgram">
-                            <option value="">Select Program</option>
+                        <select id="editProgram" required>
+                            <option value="">Select Program *</option>
                             <option value="earn-a-bike">Earn-A-Bike</option>
                             <option value="give-a-bike">Give-A-Bike</option>
                             <option value="sales">Sales</option>
-                            <option value="Strip">Strip</option>
+                            <option value="strip">Strip</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="editCondition">Condition</label>
-                        <select id="editCondition">
-                            <option value="">Select Condition</option>
+                        <select id="editCondition" required>
+                            <option value="">Select Condition *</option>
                             <option value="excellent">Excellent</option>
                             <option value="good">Good</option>
                             <option value="fair">Fair</option>
@@ -903,7 +899,7 @@ async function handleEditBikeSubmission(event) {
         model = document.getElementById('editModelNew').value;
     }
     
-    // Get donated_to value (only if status is "Donated")
+    // Get donated_to value (only if status is "donated")
     const statusValue = document.getElementById('editStatus').value;
     let donatedTo = '';
     if (statusValue === 'donated') {
