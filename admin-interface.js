@@ -630,7 +630,6 @@ async function showEditBikeModal(bike) {
                             <option value="good">Good</option>
                             <option value="fair">Fair</option>
                             <option value="poor">Poor</option>
-                            <option value="For Parts">For Parts</option>
                         </select>
                     </div>
                     <div class="form-group">
