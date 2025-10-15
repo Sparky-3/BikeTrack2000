@@ -1436,6 +1436,26 @@ body:has(.donation-form) .header {
     border-top: 2px solid #1e3a8a;
 }
 
+#editBikeModal .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #1e3a8a;
+    border-radius: 0;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #fef3c7;
+    color: #1e3a8a;
+    font-family: 'Courier New', monospace;
+    font-weight: 500;
+}
+
+#editBikeModal .form-control:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    background: #e6f3ff;
+}
+
 .donation-section {
     margin-top: 1.5rem;
     padding: 1.5rem;

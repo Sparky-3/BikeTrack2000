@@ -550,7 +550,7 @@ async function editDonor(donorId) {
 }
 
 // Show edit bike modal
-function showEditBikeModal(bike) {
+async function showEditBikeModal(bike) {
     // Create modal if it doesn't exist
     let modal = document.getElementById('editBikeModal');
     if (!modal) {
@@ -558,7 +558,7 @@ function showEditBikeModal(bike) {
         modal.id = 'editBikeModal';
         modal.className = 'modal';
         modal.innerHTML = `
-            <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-content" style="max-width: 600px; margin-top: 5vh;">
                 <span class="close" onclick="closeEditBikeModal()">&times;</span>
                 <h2>Edit Bike</h2>
                 <form id="editBikeForm">
@@ -568,11 +568,21 @@ function showEditBikeModal(bike) {
                     </div>
                     <div class="form-group">
                         <label for="editBrand">Brand</label>
-                        <input type="text" id="editBrand">
+                        <select id="editBrand">
+                            <option value="">Select brand...</option>
+                            <option value="__ADD_NEW__">+ Add New Brand</option>
+                        </select>
+                        <input type="text" id="editBrandNew" placeholder="Enter new brand name" 
+                               style="display: none; margin-top: 0.5rem;" class="form-control">
                     </div>
                     <div class="form-group">
                         <label for="editModel">Model</label>
-                        <input type="text" id="editModel">
+                        <select id="editModel">
+                            <option value="">Select model...</option>
+                            <option value="__ADD_NEW__">+ Add New Model</option>
+                        </select>
+                        <input type="text" id="editModelNew" placeholder="Enter new model name" 
+                               style="display: none; margin-top: 0.5rem;" class="form-control">
                     </div>
                     <div class="form-group">
                         <label for="editType">Type</label>
@@ -657,12 +667,59 @@ function showEditBikeModal(bike) {
         
         // Add form submit handler
         document.getElementById('editBikeForm').addEventListener('submit', handleEditBikeSubmission);
+        
+        // Setup brand/model listeners
+        setupEditBikeBrandModelListeners();
     }
+    
+    // Load brands and models into dropdowns
+    await loadBrandsAndModelsForEdit();
     
     // Populate form with current bike data
     document.getElementById('editSerialNumber').value = bike.serial_number || '';
-    document.getElementById('editBrand').value = bike.brand || '';
-    document.getElementById('editModel').value = bike.model || '';
+    
+    // Handle brand selection
+    const brandSelect = document.getElementById('editBrand');
+    if (bike.brand && brandSelect.options.length > 2) {
+        // Check if the bike's brand exists in the dropdown
+        let brandExists = false;
+        for (let option of brandSelect.options) {
+            if (option.value === bike.brand) {
+                brandSelect.value = bike.brand;
+                brandExists = true;
+                break;
+            }
+        }
+        // If brand doesn't exist in dropdown, show it in the new input field
+        if (!brandExists && bike.brand) {
+            brandSelect.value = '__ADD_NEW__';
+            const brandNewInput = document.getElementById('editBrandNew');
+            brandNewInput.style.display = 'block';
+            brandNewInput.value = bike.brand;
+        }
+    }
+    
+    // Handle model selection
+    const modelSelect = document.getElementById('editModel');
+    if (bike.model && modelSelect.options.length > 2) {
+        // Check if the bike's model exists in the dropdown
+        let modelExists = false;
+        for (let option of modelSelect.options) {
+            if (option.value === bike.model) {
+                modelSelect.value = bike.model;
+                modelExists = true;
+                break;
+            }
+        }
+        // If model doesn't exist in dropdown, show it in the new input field
+        if (!modelExists && bike.model) {
+            modelSelect.value = '__ADD_NEW__';
+            const modelNewInput = document.getElementById('editModelNew');
+            modelNewInput.style.display = 'block';
+            modelNewInput.value = bike.model;
+        }
+    }
+    
     document.getElementById('editType').value = bike.type || '';
     document.getElementById('editSize').value = bike.size || '';
     document.getElementById('editValue').value = bike.value || '';
@@ -688,6 +745,105 @@ function closeEditBikeModal() {
     }
 }
 
+// Load brands and models for edit modal
+async function loadBrandsAndModelsForEdit() {
+    if (!window.supabaseClient) {
+        console.error('Supabase client not initialized');
+        return;
+    }
+    
+    try {
+        // Fetch brands
+        const { data: brands, error: brandsError } = await window.supabaseClient
+            .from('brands')
+            .select('name')
+            .order('name', { ascending: true });
+        
+        if (brandsError) throw brandsError;
+        
+        // Fetch models
+        const { data: models, error: modelsError } = await window.supabaseClient
+            .from('models')
+            .select('name')
+            .order('name', { ascending: true });
+        
+        if (modelsError) throw modelsError;
+        
+        // Populate brand dropdown
+        const brandSelect = document.getElementById('editBrand');
+        if (brandSelect && brands) {
+            // Clear existing options except the first two
+            while (brandSelect.options.length > 2) {
+                brandSelect.removeChild(brandSelect.lastChild);
+            }
+            
+            // Add brand options
+            brands.forEach(brand => {
+                const option = document.createElement('option');
+                option.value = brand.name;
+                option.textContent = brand.name;
+                brandSelect.appendChild(option);
+            });
+        }
+        
+        // Populate model dropdown
+        const modelSelect = document.getElementById('editModel');
+        if (modelSelect && models) {
+            // Clear existing options except the first two
+            while (modelSelect.options.length > 2) {
+                modelSelect.removeChild(modelSelect.lastChild);
+            }
+            
+            // Add model options
+            models.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model.name;
+                option.textContent = model.name;
+                modelSelect.appendChild(option);
+            });
+        }
+        
+    } catch (error) {
+        console.error('Error loading brands and models:', error);
+    }
+}
+
+// Setup brand/model listeners for edit modal
+function setupEditBikeBrandModelListeners() {
+    const brandSelect = document.getElementById('editBrand');
+    const brandNewInput = document.getElementById('editBrandNew');
+    const modelSelect = document.getElementById('editModel');
+    const modelNewInput = document.getElementById('editModelNew');
+    
+    if (brandSelect && brandNewInput) {
+        brandSelect.addEventListener('change', function() {
+            if (this.value === '__ADD_NEW__') {
+                brandNewInput.style.display = 'block';
+                brandNewInput.required = true;
+                this.required = false;
+            } else {
+                brandNewInput.style.display = 'none';
+                brandNewInput.required = false;
+                this.required = true;
+            }
+        });
+    }
+    
+    if (modelSelect && modelNewInput) {
+        modelSelect.addEventListener('change', function() {
+            if (this.value === '__ADD_NEW__') {
+                modelNewInput.style.display = 'block';
+                modelNewInput.required = true;
+                this.required = false;
+            } else {
+                modelNewInput.style.display = 'none';
+                modelNewInput.required = false;
+                this.required = true;
+            }
+        });
+    }
+}
+
 // Handle edit bike form submission
 async function handleEditBikeSubmission(event) {
     event.preventDefault();
@@ -695,11 +851,23 @@ async function handleEditBikeSubmission(event) {
     const modal = document.getElementById('editBikeModal');
     const bikeId = modal.dataset.bikeId;
     
+    // Get brand (either from dropdown or new input)
+    let brand = document.getElementById('editBrand').value;
+    if (brand === '__ADD_NEW__') {
+        brand = document.getElementById('editBrandNew').value;
+    }
+    
+    // Get model (either from dropdown or new input)
+    let model = document.getElementById('editModel').value;
+    if (model === '__ADD_NEW__') {
+        model = document.getElementById('editModelNew').value;
+    }
+    
     // Collect form data
     const formData = {
         serial_number: document.getElementById('editSerialNumber').value,
-        brand: document.getElementById('editBrand').value,
-        model: document.getElementById('editModel').value,
+        brand: brand,
+        model: model,
         type: document.getElementById('editType').value,
         size: document.getElementById('editSize').value,
         value: document.getElementById('editValue').value ? parseInt(document.getElementById('editValue').value) : null,
@@ -712,6 +880,19 @@ async function handleEditBikeSubmission(event) {
     };
     
     try {
+        // If new brand/model was added, ensure they exist in the database
+        if (brand && document.getElementById('editBrand').value === '__ADD_NEW__') {
+            await window.supabaseClient
+                .from('brands')
+                .upsert({ name: brand }, { onConflict: 'name', ignoreDuplicates: true });
+        }
+        
+        if (model && document.getElementById('editModel').value === '__ADD_NEW__') {
+            await window.supabaseClient
+                .from('models')
+                .upsert({ name: model }, { onConflict: 'name', ignoreDuplicates: true });
+        }
+        
         // Update the bike in the database
         const { error } = await window.supabaseClient
             .from('bikes')
