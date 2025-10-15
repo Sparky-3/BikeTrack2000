@@ -927,10 +927,14 @@ async function handleEditBikeSubmission(event) {
         program: programValue, // Use the processed program value
         condition: document.getElementById('editCondition').value,
         status: document.getElementById('editStatus').value,
-        donated_to: donatedTo,
         notes: document.getElementById('editNotes').value,
         bottom_bracket_serial: document.getElementById('editBottomBracketSerial').value
     };
+    
+    // Only include donated_to if it has a value (status is "donated")
+    if (donatedTo && donatedTo.trim()) {
+        formData.donated_to = donatedTo;
+    }
     
     try {
         // If new brand/model was added, ensure they exist in the database
