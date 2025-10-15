@@ -644,7 +644,7 @@ async function showEditBikeModal(bike) {
                             <option value="Strip">Strip</option>
                         </select>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" id="editDonatedToGroup" style="display: none;">
                         <label for="editDonatedTo">Donated To</label>
                         <input type="text" id="editDonatedTo" placeholder="Enter recipient name">
                     </div>
@@ -670,6 +670,9 @@ async function showEditBikeModal(bike) {
         
         // Setup brand/model listeners
         setupEditBikeBrandModelListeners();
+        
+        // Setup status change listener
+        setupEditBikeStatusListener();
     }
     
     // Load brands and models into dropdowns
@@ -727,7 +730,17 @@ async function showEditBikeModal(bike) {
     document.getElementById('editCondition').value = bike.condition || '';
     document.getElementById('editStatus').value = bike.status || 'In stock';
     
-    document.getElementById('editDonatedTo').value = bike.donated_to || '';
+    // Handle donated_to field visibility and value
+    const donatedToGroup = document.getElementById('editDonatedToGroup');
+    const donatedToInput = document.getElementById('editDonatedTo');
+    
+    if (bike.status === 'Donated') {
+        donatedToGroup.style.display = 'block';
+        donatedToInput.value = bike.donated_to || '';
+    } else {
+        donatedToGroup.style.display = 'none';
+        donatedToInput.value = '';
+    }
     
     document.getElementById('editNotes').value = bike.notes || '';
     document.getElementById('editBottomBracketSerial').value = bike.bottom_bracket_serial || '';
@@ -849,6 +862,24 @@ function setupEditBikeBrandModelListeners() {
     
 }
 
+// Setup status change listener for edit modal
+function setupEditBikeStatusListener() {
+    const statusSelect = document.getElementById('editStatus');
+    const donatedToGroup = document.getElementById('editDonatedToGroup');
+    const donatedToInput = document.getElementById('editDonatedTo');
+    
+    if (statusSelect && donatedToGroup && donatedToInput) {
+        statusSelect.addEventListener('change', function() {
+            if (this.value === 'Donated') {
+                donatedToGroup.style.display = 'block';
+            } else {
+                donatedToGroup.style.display = 'none';
+                donatedToInput.value = ''; // Clear the field when hiding
+            }
+        });
+    }
+}
+
 // Handle edit bike form submission
 async function handleEditBikeSubmission(event) {
     event.preventDefault();
@@ -868,8 +899,12 @@ async function handleEditBikeSubmission(event) {
         model = document.getElementById('editModelNew').value;
     }
     
-    // Get donated_to value
-    let donatedTo = document.getElementById('editDonatedTo').value.trim();
+    // Get donated_to value (only if status is "Donated")
+    const statusValue = document.getElementById('editStatus').value;
+    let donatedTo = '';
+    if (statusValue === 'Donated') {
+        donatedTo = document.getElementById('editDonatedTo').value.trim();
+    }
     
     // Collect form data
     const formData = {
@@ -903,33 +938,45 @@ async function handleEditBikeSubmission(event) {
         
         // If donated_to is provided, ensure the recipient exists in the database
         if (donatedTo) {
-            // First, check if the recipient already exists
-            const { data: existingRecipient, error: checkError } = await window.supabaseClient
-                .from('recipients')
-                .select('name')
-                .eq('name', donatedTo)
-                .single();
-            
-            // If recipient doesn't exist, create it
-            if (!existingRecipient && !checkError) {
-                const { error: createError } = await window.supabaseClient
+            try {
+                // First, check if the recipient already exists
+                const { data: existingRecipient, error: checkError } = await window.supabaseClient
                     .from('recipients')
-                    .insert({ name: donatedTo });
+                    .select('name')
+                    .eq('name', donatedTo)
+                    .maybeSingle(); // Use maybeSingle() instead of single() to avoid error when not found
                 
-                if (createError) {
-                    console.error('Error creating recipient:', createError);
-                    // Don't throw here - let the bike update proceed
+                // If recipient doesn't exist (no data and no error), create it
+                if (!existingRecipient && !checkError) {
+                    const { error: createError } = await window.supabaseClient
+                        .from('recipients')
+                        .insert({ name: donatedTo });
+                    
+                    if (createError) {
+                        console.error('Error creating recipient:', createError);
+                        throw createError; // Throw the error to prevent bike update with invalid recipient
+                    }
                 }
+            } catch (error) {
+                console.error('Error handling recipient:', error);
+                alert('Error with recipient: ' + error.message);
+                return; // Stop the form submission
             }
         }
         
         // Update the bike in the database
+        console.log('Updating bike with data:', formData);
         const { error } = await window.supabaseClient
             .from('bikes')
             .update(formData)
             .eq('id', bikeId);
             
-        if (error) throw error;
+        if (error) {
+            console.error('Error updating bike:', error);
+            throw error;
+        }
+        
+        console.log('Bike updated successfully');
         
         // Close modal and refresh the table
         closeEditBikeModal();
